@@ -1,15 +1,19 @@
 const express = require('express');
 const controller = require('./document.controller');
-const { authenticate, requireRoles } = require('../../middlewares/auth');
+const { authenticate } = require('../../middlewares/auth');
 const { uploadDocument } = require('../../middlewares/upload');
 
 const router = express.Router();
 
 router.get('/', controller.listDocuments);
+router.get('/catalog/universities', controller.listUniversities);
+router.get('/catalog/faculties', controller.listFaculties);
+router.get('/catalog/subjects', controller.listSubjects);
+router.get('/mine', authenticate, controller.listMyDocuments);
+router.get('/:id', controller.getDocument);
 router.post(
   '/',
   authenticate,
-  requireRoles('CONTRIBUTOR', 'MODERATOR', 'ADMIN'),
   uploadDocument,
   controller.createDocument,
 );

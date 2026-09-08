@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-const seedPasswordHash = '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
+const seedPasswordHash = '$2b$12$vmKvBgVCD6jJiSRfuT.V0.Vrj49j9F85YiipcJQDxkmI3Nt1g/2Rm'; // Admin123!
 
 const daysAgo = (days: number) => {
   const date = new Date();
