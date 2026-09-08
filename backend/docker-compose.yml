@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: digital-learning-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: digital_learning
+      POSTGRES_PASSWORD: digital_learning_dev
+      POSTGRES_DB: digital_learning
+    ports:
+      - "5432:5432"
+    volumes:
+      - digital_learning_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U digital_learning -d digital_learning"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  digital_learning_postgres_data:

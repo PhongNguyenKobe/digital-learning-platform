@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-tertiary-fixed-variant": "#005236", "surface-dim": "#d3daef", "on-primary-container": "#a8b8ff", "on-secondary-fixed": "#001a42", "surface-tint": "#3755c3", "primary-fixed-dim": "#b8c4ff", "error-container": "#ffdad6", "surface": "#f9f9ff", "on-error": "#ffffff", "surface-container-high": "#e1e8fd", "error": "#ba1a1a", "primary": "#00288e", "on-secondary": "#ffffff", "on-primary": "#ffffff", "secondary-container": "#2170e4", "on-tertiary-fixed": "#002113", "inverse-on-surface": "#edf0ff", "tertiary-fixed": "#6ffbbe", "on-error-container": "#93000a", "tertiary-container": "#00563a", "outline": "#757684", "on-tertiary-container": "#3fd298", "secondary-fixed": "#d8e2ff", "tertiary-fixed-dim": "#4edea3", "primary-fixed": "#dde1ff", "surface-bright": "#f9f9ff", "inverse-primary": "#b8c4ff", "on-secondary-container": "#fefcff", "surface-container": "#e9edff", "on-primary-fixed-variant": "#173bab", "on-background": "#141b2b", "on-secondary-fixed-variant": "#004395", "surface-container-low": "#f1f3ff", "secondary-fixed-dim": "#adc6ff", "on-tertiary": "#ffffff", "surface-container-lowest": "#ffffff", "surface-variant": "#dce2f7", "on-surface-variant": "#444653", "background": "#f9f9ff", "on-primary-fixed": "#001453", "secondary": "#0058be", "inverse-surface": "#293040", "on-surface": "#141b2b", "tertiary": "#003d27", "primary-container": "#1e40af", "outline-variant": "#c4c5d5", "surface-container-highest": "#dce2f7" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "container-max": "80rem", "gutter-desktop": "1.5rem", "gutter-mobile": "1rem", "space-sm": "0.75rem", "space-xl": "2rem", "space-2xl": "3rem", "space-3xl": "4.5rem", "space-md": "1rem", "space-xxs": "0.25rem", "space-lg": "1.5rem", "space-xs": "0.5rem" }, "fontFamily": { "display-hero-mobile": [ "Inter" ], "body-lg": [ "Inter" ], "headline-sm": [ "Inter" ], "headline-md": [ "Inter" ], "label-md": [ "Inter" ], "label-sm": [ "Inter" ], "headline-lg": [ "Inter" ], "body-sm": [ "Inter" ], "headline-xl": [ "Inter" ], "body-md": [ "Inter" ], "headline-xl-mobile": [ "Inter" ], "label-lg": [ "Inter" ], "display-hero": [ "Inter" ] }, "fontSize": { "display-hero-mobile": [ "28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" } ], "body-lg": [ "16px", { "lineHeight": "26px", "fontWeight": "400" } ], "headline-sm": [ "16px", { "lineHeight": "24px", "fontWeight": "600" } ], "headline-md": [ "18px", { "lineHeight": "26px", "fontWeight": "600" } ], "label-md": [ "12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" } ], "label-sm": [ "11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" } ], "headline-lg": [ "22px", { "lineHeight": "30px", "fontWeight": "600" } ], "body-sm": [ "13px", { "lineHeight": "20px", "fontWeight": "400" } ], "headline-xl": [ "30px", { "lineHeight": "38px", "letterSpacing": "-0.015em", "fontWeight": "700" } ], "body-md": [ "14px", { "lineHeight": "22px", "fontWeight": "400" } ], "headline-xl-mobile": [ "24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" } ], "label-lg": [ "14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" } ], "display-hero": [ "40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" } ] } } } };</script></head><body class="bg-background font-body-md text-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 max-w-[80rem] mx-auto px-gutter-mobile lg:px-gutter-desktop flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg shrink-0"><div class="flex items-center gap-space-xs"><img alt="Logo Học Liệu Số" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBy1Iw5FZMPN2P92dYDO4Llsuj1rZcZvL3evNQ2eiBgIUSywlav3g27KllMjCfaxjuh1XyuHO0lFwl_AUGtrOpKg3CdzfXfiuC0ANkPMEdDbzXs8x4REzT4nzAnCdI_zzM652yqL5tIm8EsaNVzQQ-ltQ-zC44XNsCGfUWBROAzOXl89ubV3-uMIaysSeLRdnXt6wfORWbPdf_xGu4PlEbM1SteFYw98CnshPdan45-4FOH3pQjNSaoFA"/><div class="flex flex-col"><span class="font-headline-md text-headline-md text-primary leading-tight tracking-tight">Học Liệu Số</span><span class="font-label-sm text-label-sm text-on-surface-variant hidden sm:inline-block leading-none">Chia sẻ tri thức học thuật</span></div></div><div class="relative hidden xl:block"><button class="flex items-center gap-space-xs px-space-sm py-space-xs rounded bg-surface-container-low hover:bg-surface-container text-on-surface font-label-lg text-label-lg transition-colors"><span class="material-symbols-outlined text-primary text-[20px]">apps</span><span>Ngành học &amp; Trường ĐH</span><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></button></div></div><div class="flex-1 max-w-xl mx-space-sm hidden md:block"><div class="relative flex items-center"><span class="material-symbols-outlined absolute left-3 text-outline text-[20px]">search</span><input class="w-full pl-10 pr-12 py-space-xs rounded bg-surface-container-lowest text-on-surface font-body-sm text-body-sm outline-none ring-1 ring-outline-variant focus:ring-2 focus:ring-primary placeholder:text-outline transition-all" placeholder="Tìm kiếm giáo trình, đề thi, tóm tắt bài giảng, luận văn..." type="text"/><span class="material-symbols-outlined absolute right-3 text-outline text-[18px] cursor-pointer hover:text-on-surface">tune</span></div></div><nav class="hidden lg:flex items-center gap-space-xs shrink-0" data-active-classes="bg-surface-container text-primary font-headline-sm"><a aria-current="page" class="px-space-sm py-space-xs rounded transition-colors bg-surface-container text-primary font-headline-sm" data-path="explore-documents" href="#">Tài liệu mới</a><a class="px-space-sm py-space-xs rounded font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors" data-path="university-directory" href="#">Trường ĐH</a><a class="px-space-sm py-space-xs rounded font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors" data-path="exam-bank" href="#">Ngân hàng đề</a><a class="px-space-sm py-space-xs rounded font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors" data-path="study-groups" href="#">Diễn đàn</a></nav><div class="flex items-center gap-space-sm shrink-0"><a class="flex items-center gap-space-xxs bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg px-space-sm py-space-xs rounded transition-colors shadow-[0_1px_3px_rgba(17,24,39,0.05)]" data-path="upload-document" href="#"><span class="material-symbols-outlined text-[20px]">cloud_upload</span><span class="hidden sm:inline">Tải lên tài liệu</span></a><button class="relative p-space-xs rounded hover:bg-surface-container text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span></button><div class="flex items-center gap-space-xs pl-space-xs"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJiAQ1GRoHTI3PZsagXlkQiJENFbjDElqX5cYEcrFYli30M8R6AfRzkatJBvcs3WCKOegi8xEcaKzFrK9JeOx1TuUW1VCH5sbisnnHAHQ6MRvrIb-FdtZt0YmhDN97sw7BU_mC-rPscJNwCfNsoeV9uKJMdr2X1gsjTTuO_wD0aUZkte3dGhBfGzXEAopwy4M9WxpEtjmFT0F1LQVAGejSQxhhQ-Z79d_qHzaZMUdlc4tR3HFMSY2ofw"/><div class="hidden 2xl:flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface leading-tight">Minh Anh</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-tight">ĐHQG HN</span></div><span class="material-symbols-outlined text-on-surface-variant text-[18px] hidden 2xl:inline">arrow_drop_down</span></div></div></div></header><main class="w-full pt-16 bg-background min-h-screen"><div class="flex flex-col w-full max-w-[80rem] mx-auto px-gutter-mobile lg:px-gutter-desktop py-space-md">
+<!-- 1. Breadcrumb Navigation -->
+<nav aria-label="Breadcrumb" class="flex items-center flex-wrap gap-space-xs text-on-surface-variant font-label-md text-label-md mb-space-sm">
+<a class="hover:text-primary transition-colors flex items-center gap-space-xxs" href="#">
+<span class="material-symbols-outlined text-[16px]">home</span>
+<span>Trang chủ</span>
+</a>
+<span class="material-symbols-outlined text-outline-variant text-[14px]">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">ĐH Kinh Tế Quốc Dân</a>
+<span class="material-symbols-outlined text-outline-variant text-[14px]">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Khoa Toán Kinh Tế</a>
+<span class="material-symbols-outlined text-outline-variant text-[14px]">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Kinh tế lượng</a>
+<span class="material-symbols-outlined text-outline-variant text-[14px]">chevron_right</span>
+<span class="text-on-surface font-semibold truncate max-w-xs md:max-w-md">Tổng hợp đề thi &amp; đáp án chi tiết 2021-2024</span>
+</nav>
+<!-- 2. Header Strip of Document -->
+<div class="flex flex-col gap-space-xs mb-space-lg">
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[14px]">school</span>
+        ĐH Kinh Tế Quốc Dân (NEU)
+      </span>
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded-full bg-tertiary-container text-on-tertiary font-label-sm text-label-sm font-semibold shadow-sm">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+        Đã xác thực chất lượng
+      </span>
+<span class="inline-flex items-center gap-space-xxs px-space-xs py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+        Tài liệu chuẩn 2024
+      </span>
+</div>
+<div class="flex flex-col md:flex-row md:items-baseline justify-between gap-space-sm">
+<h1 class="font-headline-xl text-headline-xl text-on-surface font-bold tracking-tight">
+        Tổng hợp đề thi &amp; đáp án chi tiết môn Kinh tế Lượng 2021-2024
+      </h1>
+<div class="flex items-center gap-space-sm shrink-0 font-label-md text-label-md text-on-surface-variant">
+<span class="flex items-center gap-space-xxs text-primary font-semibold">
+<span class="material-symbols-outlined text-[16px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+          4.9 (182)
+        </span>
+<span class="text-outline-variant">•</span>
+<span class="flex items-center gap-space-xxs">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+          15,200
+        </span>
+</div>
+</div>
+</div>
+<!-- 3. Main Split View Grid (68% Document View, 32% Sticky Sidebar) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- LEFT COLUMN: Interactive Document Viewer (8 cols out of 12 = 66.7% ~ 68%) -->
+<div class="lg:col-span-8 flex flex-col gap-space-md">
+<!-- Viewer Floating Control Toolbar -->
+<div class="sticky top-20 z-20 flex items-center justify-between px-space-sm py-space-xs bg-surface-container-lowest/95 backdrop-blur-md rounded-xl shadow-md">
+<div class="flex items-center gap-space-xs">
+<div class="flex items-center bg-surface-container-low rounded px-space-xs py-1 text-on-surface font-label-sm text-label-sm font-semibold">
+<span id="pageIndicator">Trang 3</span>
+<span class="text-on-surface-variant mx-1">/</span>
+<span class="text-on-surface-variant">48</span>
+</div>
+<button class="p-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" id="prevPageBtn" title="Trang trước">
+<span class="material-symbols-outlined text-[20px]">keyboard_arrow_up</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" id="nextPageBtn" title="Trang sau">
+<span class="material-symbols-outlined text-[20px]">keyboard_arrow_down</span>
+</button>
+</div>
+<div class="flex items-center gap-space-xxs">
+<button class="p-1.5 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" id="zoomOutBtn" title="Thu nhỏ">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</button>
+<span class="font-label-sm text-label-sm text-on-surface-variant px-1 select-none" id="zoomLabel">100%</span>
+<button class="p-1.5 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" id="zoomInBtn" title="Phóng to">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+<div class="w-px h-4 bg-outline-variant/40 mx-1"></div>
+<button class="p-1.5 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" title="Vừa chiều ngang">
+<span class="material-symbols-outlined text-[18px]">fit_screen</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" title="In tài liệu">
+<span class="material-symbols-outlined text-[18px]">print</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" title="Toàn màn hình">
+<span class="material-symbols-outlined text-[18px]">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- Document Canvas / Paper Stack -->
+<div class="flex flex-col gap-space-md w-full transition-transform origin-top" id="viewerViewport">
+<!-- Page 1: Cover Sheet -->
+<div class="w-full bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col justify-between aspect-[1/1.414] min-h-[620px] relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Trường Đại Học Kinh Tế Quốc Dân</span>
+<span class="font-headline-sm text-headline-sm text-primary font-bold">Khoa Toán Kinh Tế — Bộ Môn Kinh Tế Lượng</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary font-bold">
+              NEU
+            </div>
+</div>
+<div class="my-auto text-center flex flex-col items-center py-space-xl">
+<span class="px-space-sm py-1 bg-surface-container text-primary rounded-full font-label-sm text-label-sm font-semibold mb-space-sm">
+              TÀI LIỆU ÔN THI CHÍNH THỨC
+            </span>
+<h2 class="font-display-hero-mobile md:font-display-hero text-display-hero-mobile md:text-display-hero text-on-surface font-bold leading-tight max-w-xl mb-space-sm">
+              TỔNG HỢP ĐỀ THI &amp; ĐÁP ÁN KINH TẾ LƯỢNG
+            </h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+              Tuyển tập 12 bộ đề thi cuối kỳ từ 2021 đến 2024, kèm phân tích hồi quy Stata, Eviews và giải chi tiết từng bước kiểm định.
+            </p>
+</div>
+<div class="flex justify-between items-end text-on-surface-variant font-label-sm text-label-sm pt-space-md bg-surface-container-low/50 rounded-lg p-space-sm">
+<div>
+<p>Biên tập: <span class="text-on-surface font-semibold">Thảo My (K62 Toán Kinh tế)</span></p>
+<p>Giáo trình tham chiếu: Introductory Econometrics - Wooldridge</p>
+</div>
+<div class="text-right">
+<span class="font-semibold text-primary">Trang 1 / 48</span>
+</div>
+</div>
+</div>
+<!-- Page 2: Analytical Matrix & Solved Problem -->
+<div class="w-full bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-md aspect-[1/1.414] min-h-[620px] relative">
+<div class="flex justify-between items-center text-on-surface-variant font-label-sm text-label-sm">
+<span>CHƯƠNG 3: MÔ HÌNH HỒI QUY BỘI &amp; ƯỚC LƯỢNG OLS</span>
+<span>Trang 2 / 48</span>
+</div>
+<div class="flex flex-col gap-space-xs">
+<h3 class="font-headline-md text-headline-md text-on-surface font-semibold">
+              Bài 1 (Đề thi K61 - NEU): Ước lượng hàm hồi quy tiêu dùng
+            </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Cho bảng kết quả hồi quy mô hình tổng quát: <code class="font-mono text-primary font-semibold">Y_i = β_1 + β_2 X_2i + β_3 X_3i + u_i</code> từ mẫu gồm n = 45 hộ gia đình.
+            </p>
+</div>
+<!-- Stata Style Academic Table -->
+<div class="overflow-x-auto rounded-lg bg-surface-container-low p-space-xs">
+<table class="w-full text-left font-mono text-label-sm text-label-sm text-on-surface">
+<thead>
+<tr class="text-on-surface-variant">
+<th class="py-1 px-2 font-semibold">Biến (Variable)</th>
+<th class="py-1 px-2 font-semibold">Hệ số (Coef.)</th>
+<th class="py-1 px-2 font-semibold">Sai số chuẩn (Std. Err.)</th>
+<th class="py-1 px-2 font-semibold">t-Statistic</th>
+<th class="py-1 px-2 font-semibold">P &gt; |t|</th>
+</tr>
+</thead>
+<tbody class="text-on-surface">
+<tr class="hover:bg-surface-container">
+<td class="py-1 px-2 font-semibold text-primary">X2 (Thu nhập)</td>
+<td class="py-1 px-2">0.7241</td>
+<td class="py-1 px-2">0.0815</td>
+<td class="py-1 px-2">8.88</td>
+<td class="py-1 px-2 font-semibold text-tertiary-container">0.000</td>
+</tr>
+<tr class="hover:bg-surface-container">
+<td class="py-1 px-2 font-semibold text-primary">X3 (Số người phụ thuộc)</td>
+<td class="py-1 px-2">124.50</td>
+<td class="py-1 px-2">34.12</td>
+<td class="py-1 px-2">3.65</td>
+<td class="py-1 px-2 font-semibold text-tertiary-container">0.001</td>
+</tr>
+<tr class="hover:bg-surface-container">
+<td class="py-1 px-2 font-semibold">_cons (Hệ số chặn)</td>
+<td class="py-1 px-2">452.18</td>
+<td class="py-1 px-2">98.40</td>
+<td class="py-1 px-2">4.60</td>
+<td class="py-1 px-2 font-semibold text-tertiary-container">0.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Formula & Math Steps -->
+<div class="flex flex-col gap-space-xs font-body-sm text-body-sm text-on-surface bg-surface-container/60 p-space-sm rounded-lg">
+<p class="font-headline-sm text-headline-sm text-primary">Lời giải chi tiết:</p>
+<p>1. Khoảng tin cậy 95% cho hệ số góc của biến Thu nhập <span class="font-mono font-semibold">β_2</span>:</p>
+<div class="p-space-xs bg-surface-container-lowest rounded font-mono text-center text-primary-container">
+              β̂_2 ± t_(α/2; n-k) × Se(β̂_2) = 0.7241 ± (2.018 × 0.0815) = [0.5596 ; 0.8885]
+            </div>
+<p class="text-on-surface-variant">
+              → Ý nghĩa: Khi thu nhập hộ gia đình tăng 1 triệu VNĐ, chi tiêu tiêu dùng bình quân tăng tối thiểu 0.56 triệu và tối đa 0.89 triệu VNĐ với độ tin cậy 95%.
+            </p>
+</div>
+<!-- Mini Inline Chart: Regression Fit Graph -->
+<div class="mt-auto bg-surface-container-low p-space-sm rounded-lg flex items-center gap-space-md">
+<div class="shrink-0 w-32 h-20 bg-surface-container-lowest rounded p-1 flex items-end justify-center relative overflow-hidden">
+<svg class="w-full h-full text-primary" viewbox="0 0 120 70">
+<!-- Axes -->
+<line opacity="0.3" stroke="currentColor" stroke-width="1.5" x1="10" x2="115" y1="65" y2="65"></line>
+<line opacity="0.3" stroke="currentColor" stroke-width="1.5" x1="10" x2="10" y1="5" y2="65"></line>
+<!-- Regression trend line -->
+<line stroke="currentColor" stroke-width="2" x1="15" x2="110" y1="55" y2="15"></line>
+<!-- Confidence bounds (dashed) -->
+<path d="M 15 50 Q 60 32 110 10" fill="none" opacity="0.5" stroke="currentColor" stroke-dasharray="2,2" stroke-width="1"></path>
+<path d="M 15 60 Q 60 38 110 20" fill="none" opacity="0.5" stroke="currentColor" stroke-dasharray="2,2" stroke-width="1"></path>
+<!-- Data Scatter Points -->
+<circle cx="25" cy="50" fill="currentColor" r="2"></circle>
+<circle cx="45" cy="40" fill="currentColor" r="2"></circle>
+<circle cx="65" cy="36" fill="currentColor" r="2"></circle>
+<circle cx="85" cy="22" fill="currentColor" r="2"></circle>
+<circle cx="100" cy="18" fill="currentColor" r="2"></circle>
+</svg>
+</div>
+<div class="flex flex-col font-label-sm text-label-sm">
+<span class="font-semibold text-on-surface">Đồ thị phân tán &amp; Đường hồi quy tuyến tính OLS</span>
+<span class="text-on-surface-variant">R-squared = 0.842 | Kiểm định F = 112.4 (Prob &gt; F = 0.0000)</span>
+</div>
+</div>
+</div>
+<!-- Page 3: Breusch-Pagan & White Test Details -->
+<div class="w-full bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-md aspect-[1/1.414] min-h-[620px] relative">
+<div class="flex justify-between items-center text-on-surface-variant font-label-sm text-label-sm">
+<span>CHƯƠNG 6: KHẮC PHỤC PHƯƠNG SAI SAI SỐ THAY ĐỔI</span>
+<span>Trang 3 / 48</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface font-semibold">
+            Câu 4 (Đề K62 - Học kỳ 1 2023): Quy trình kiểm định White tổng quát
+          </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Kiểm tra xem mô hình chi tiêu có vi phạm giả thiết phương sai thuần nhất (Homoscedasticity) hay không. Mô hình phụ hồi quy phần dư bình phương <code class="font-mono text-primary font-semibold">e_i^2</code> theo các biến độc lập, bình phương các biến và tích chéo.
+          </p>
+<div class="p-space-sm bg-surface-container rounded-lg font-mono text-body-sm text-body-sm text-on-surface flex flex-col gap-1">
+<span class="text-primary font-semibold">H_0: α_2 = α_3 = ... = α_m = 0 (Phương sai sai số không đổi)</span>
+<span>H_1: Có ít nhất một α_j ≠ 0 (Phương sai sai số thay đổi)</span>
+<div class="mt-1 pt-1 bg-surface-container-low p-space-xs rounded text-primary-container font-semibold">
+              LM = n × R^2_auxiliary ~ χ^2(df = m-1)
+            </div>
+</div>
+<div class="flex flex-col gap-1 font-body-sm text-body-sm text-on-surface-variant">
+<p>• Giá trị quan sát: <span class="font-mono font-semibold text-on-surface">LM_qs = 45 × 0.312 = 14.04</span></p>
+<p>• Tra bảng Khi bình phương: <span class="font-mono font-semibold text-on-surface">χ^2_0.05(5) = 11.07</span></p>
+<p class="text-error font-semibold">→ Vì LM_qs &gt; 11.07 nên BÁC BỎ H0: Mô hình mắc khuyết tật phương sai sai số thay đổi.</p>
+</div>
+<div class="p-space-sm bg-surface-container-low rounded-lg mt-auto flex items-center justify-between text-label-sm text-label-sm">
+<span class="text-on-surface font-semibold">Biện pháp khắc phục khuyến nghị:</span>
+<span class="text-primary font-semibold">Sử dụng sai số chuẩn vững Robust White Standard Errors (vce: robust)</span>
+</div>
+</div>
+<!-- Paywall Blurred Pages Container (StuDocu Inspiration) -->
+<div class="relative w-full rounded-xl overflow-hidden shadow-sm">
+<!-- Blurred Background Fake Content -->
+<div class="w-full bg-surface-container-lowest p-space-xl filter blur-[6px] select-none pointer-events-none opacity-40">
+<div class="h-6 w-1/3 bg-on-surface-variant/30 rounded mb-4"></div>
+<div class="h-4 w-full bg-on-surface-variant/20 rounded mb-2"></div>
+<div class="h-4 w-4/5 bg-on-surface-variant/20 rounded mb-2"></div>
+<div class="h-4 w-2/3 bg-on-surface-variant/20 rounded mb-6"></div>
+<div class="h-40 w-full bg-surface-container rounded mb-4"></div>
+<div class="h-4 w-full bg-on-surface-variant/20 rounded mb-2"></div>
+<div class="h-4 w-3/4 bg-on-surface-variant/20 rounded mb-6"></div>
+<div class="h-32 w-full bg-surface-container rounded"></div>
+</div>
+<!-- Paywall Prompt Overlay Banner -->
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/90 to-surface-container-lowest/50 flex flex-col items-center justify-center text-center p-space-lg">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-lg mb-space-sm">
+<span class="material-symbols-outlined text-[28px]">lock_open</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface font-bold mb-space-xs max-w-md">
+              Mở khóa toàn bộ 48 trang tài liệu &amp; lời giải
+            </h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg mb-space-lg">
+              Bạn đang xem 3 trang đầu miễn phí. Tham gia cùng hơn 45,000 sinh viên NEU: Đăng nhập hoặc đóng góp 1 tài liệu để xem trọn bộ và tải file PDF in ấn gốc.
+            </p>
+<div class="flex flex-col sm:flex-row items-center gap-space-sm w-full max-w-md">
+<a class="w-full sm:w-auto flex-1 flex items-center justify-center gap-space-xxs bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg py-space-xs px-space-md rounded shadow-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+<span>Tải lên 1 tài liệu</span>
+</a>
+<a class="w-full sm:w-auto flex-1 flex items-center justify-center gap-space-xxs bg-surface-container hover:bg-surface-container-high text-primary font-label-lg text-label-lg py-space-xs px-space-md rounded transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">login</span>
+<span>Đăng nhập đọc ngay</span>
+</a>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-space-sm">
+              Miễn phí 100% dành cho sinh viên chia sẻ học liệu mở
+            </span>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Sticky Sidebar & Metadata (4 cols out of 12 = 33.3% ~ 32%) -->
+<div class="lg:col-span-4 flex flex-col gap-space-lg lg:sticky lg:top-20">
+<!-- Primary Action Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-md p-space-lg flex flex-col gap-space-md">
+<!-- Big Download CTA Button -->
+<button class="w-full h-12 bg-primary-container hover:bg-primary text-on-primary font-headline-sm text-headline-sm rounded-lg flex items-center justify-center gap-space-xs shadow-md transition-transform active:scale-[0.99]">
+<span class="material-symbols-outlined text-[24px]">download</span>
+<span>Tải xuống PDF (3.8 MB)</span>
+</button>
+<!-- Secondary Bookmark Button -->
+<button class="w-full h-10 bg-surface-container-low hover:bg-surface-container text-primary font-label-lg text-label-lg rounded-lg flex items-center justify-center gap-space-xs transition-colors" id="favoriteBtn">
+<span class="material-symbols-outlined text-[20px]" id="favoriteIcon" style="font-variation-settings: 'FILL' 0;">bookmark</span>
+<span id="favoriteText">Lưu vào mục Yêu thích</span>
+</button>
+<!-- Document Author & Verification Snapshot -->
+<div class="flex items-center gap-space-sm p-space-xs bg-surface-container-low rounded-lg">
+<img class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="Chân dung bạn nữ sinh viên trẻ Việt Nam đeo kính tri thức năng động mỉm cười trong thư viện đại học Kinh tế Quốc dân ánh sáng ấm áp" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyuRDw2maIwLJ7nfCnHB3Oc-R45WASIVxUhn-eD7QDESS0IzZ7b0sAl1QXM6JAIN70xaI7m0SNn6p6jf4ELtQhpsf3XYVeD0mILlr-uFnA0lauYrDtlpcyiu07y9u1j7cZ7npHGQxA4engKw5cwFhwidfltWOFR-TxRQCq3LVaVi-3LNdflMLhOUcaRCKXthhm4RQ5JZ8lQX6JUJhV8vT6ZIdHX-d9oXa4tG8pqrfg0daGsyQkZ026Wg"/>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center gap-space-xxs">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold truncate">Thảo My</span>
+<span class="material-symbols-outlined text-tertiary-container text-[16px]" title="Sinh viên đóng góp uy tín">verified</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">K62 Toán Kinh Tế • NEU</span>
+</div>
+<button class="px-space-xs py-1 rounded bg-surface-container text-primary font-label-sm text-label-sm hover:bg-surface-container-high transition-colors">
+            Theo dõi
+          </button>
+</div>
+<!-- Academic Document Metadata List -->
+<div class="flex flex-col gap-space-xs text-body-sm text-body-sm">
+<div class="flex justify-between py-1 text-on-surface-variant">
+<span>Ngày tải lên</span>
+<span class="text-on-surface font-semibold">15/10/2024</span>
+</div>
+<div class="flex justify-between py-1 text-on-surface-variant">
+<span>Dung lượng file</span>
+<span class="text-on-surface font-semibold">3.8 MB</span>
+</div>
+<div class="flex justify-between py-1 text-on-surface-variant">
+<span>Độ dài</span>
+<span class="text-on-surface font-semibold">48 trang (Đầy đủ)</span>
+</div>
+<div class="flex justify-between py-1 text-on-surface-variant">
+<span>Định dạng</span>
+<span class="text-on-surface font-semibold">PDF Vector Có Thể Tìm Kiếm</span>
+</div>
+<div class="flex justify-between py-1 text-on-surface-variant">
+<span>Ngôn ngữ</span>
+<span class="text-on-surface font-semibold">Tiếng Việt</span>
+</div>
+<div class="flex justify-between py-1 text-on-surface-variant">
+<span>Bản quyền</span>
+<span class="text-on-surface font-semibold">Giáo dục mở phi thương mại</span>
+</div>
+</div>
+<!-- Academic Performance Metrics Bar -->
+<div class="grid grid-cols-3 gap-space-xs text-center p-space-sm bg-surface-container-low rounded-lg">
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-primary font-bold">4.9 ★</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">182 Đánh giá</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-on-surface font-bold">4,820</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Lượt tải</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md text-on-surface font-bold">15.2k</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Lượt xem</span>
+</div>
+</div>
+<!-- DMCA Report Violation Flag -->
+<a class="flex items-center justify-center gap-space-xxs text-outline hover:text-error transition-colors font-label-sm text-label-sm text-center py-1" href="#">
+<span class="material-symbols-outlined text-[16px]">flag</span>
+<span>Báo cáo tài liệu vi phạm bản quyền / nội dung</span>
+</a>
+</div>
+<!-- Related Documents Widget -->
+<div class="bg-surface-container-lowest rounded-xl shadow-md p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold">
+            Tài liệu cùng môn học
+          </h3>
+<a class="font-label-md text-label-md text-primary hover:underline" href="#">Xem tất cả</a>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Related Doc Item 1 -->
+<a class="flex items-start gap-space-sm p-space-xs rounded-lg hover:bg-surface-container transition-colors group" href="#">
+<div class="w-12 h-14 bg-surface-container-high rounded shrink-0 flex flex-col items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">description</span>
+<span class="font-label-sm text-[9px] uppercase font-bold mt-0.5">PDF</span>
+</div>
+<div class="flex flex-col min-w-0">
+<h4 class="font-headline-sm text-body-sm font-semibold text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                Bài tập lớn Kinh tế lượng NEU đề tài Dự báo tiêu dùng năng lượng (Có data Eviews)
+              </h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">28 trang • 4.8 ★</span>
+</div>
+</a>
+<!-- Related Doc Item 2 -->
+<a class="flex items-start gap-space-sm p-space-xs rounded-lg hover:bg-surface-container transition-colors group" href="#">
+<div class="w-12 h-14 bg-surface-container-high rounded shrink-0 flex flex-col items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">table_chart</span>
+<span class="font-label-sm text-[9px] uppercase font-bold mt-0.5">XLSX</span>
+</div>
+<div class="flex flex-col min-w-0">
+<h4 class="font-headline-sm text-body-sm font-semibold text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                Bảng tổng hợp công thức hồi quy ma trận &amp; tra bảng xác suất F, t, Chi-square
+              </h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">6 trang • 5.0 ★</span>
+</div>
+</a>
+<!-- Related Doc Item 3 -->
+<a class="flex items-start gap-space-sm p-space-xs rounded-lg hover:bg-surface-container transition-colors group" href="#">
+<div class="w-12 h-14 bg-surface-container-high rounded shrink-0 flex flex-col items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">quiz</span>
+<span class="font-label-sm text-[9px] uppercase font-bold mt-0.5">PDF</span>
+</div>
+<div class="flex flex-col min-w-0">
+<h4 class="font-headline-sm text-body-sm font-semibold text-on-surface group-hover:text-primary transition-colors line-clamp-2">
+                100 câu trắc nghiệm Kinh tế lượng lý thuyết &amp; mô hình có đáp án chi tiết
+              </h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-1">32 trang • 4.9 ★</span>
+</div>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- 4. Bottom Academic Community Discussion & Ratings Section -->
+<div class="mt-space-2xl bg-surface-container-lowest rounded-xl shadow-md p-space-lg lg:p-space-xl flex flex-col gap-space-xl">
+<!-- Section Title -->
+<div class="flex flex-col gap-space-xxs">
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-bold">
+        Đánh giá &amp; Thảo luận học thuật từ sinh viên
+      </h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+        Chia sẻ thắc mắc về đáp án, phản hồi các bước chứng minh toán học và nhận hỗ trợ trực tiếp từ tác giả.
+      </p>
+</div>
+<!-- Ratings Breakdown Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-lg items-center bg-surface-container-low p-space-lg rounded-xl">
+<!-- Big Score -->
+<div class="md:col-span-4 flex flex-col items-center justify-center text-center">
+<span class="font-display-hero text-display-hero text-primary font-bold leading-none">4.9</span>
+<div class="flex items-center gap-space-xxs my-space-xs text-tertiary-container">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">star_half</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">182 lượt đánh giá học thuật</span>
+</div>
+<!-- Rating Bars -->
+<div class="md:col-span-8 flex flex-col gap-space-xs">
+<!-- 5 stars -->
+<div class="flex items-center gap-space-sm text-label-sm text-label-sm">
+<span class="w-12 text-on-surface-variant">5 sao</span>
+<div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full" style="width: 92%;"></div>
+</div>
+<span class="w-10 text-right font-semibold text-on-surface">92%</span>
+</div>
+<!-- 4 stars -->
+<div class="flex items-center gap-space-sm text-label-sm text-label-sm">
+<span class="w-12 text-on-surface-variant">4 sao</span>
+<div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full" style="width: 6%;"></div>
+</div>
+<span class="w-10 text-right font-semibold text-on-surface">6%</span>
+</div>
+<!-- 3 stars -->
+<div class="flex items-center gap-space-sm text-label-sm text-label-sm">
+<span class="w-12 text-on-surface-variant">3 sao</span>
+<div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full" style="width: 2%;"></div>
+</div>
+<span class="w-10 text-right font-semibold text-on-surface">2%</span>
+</div>
+<!-- 2 stars -->
+<div class="flex items-center gap-space-sm text-label-sm text-label-sm">
+<span class="w-12 text-on-surface-variant">2 sao</span>
+<div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full" style="width: 0%;"></div>
+</div>
+<span class="w-10 text-right font-semibold text-on-surface">0%</span>
+</div>
+<!-- 1 star -->
+<div class="flex items-center gap-space-sm text-label-sm text-label-sm">
+<span class="w-12 text-on-surface-variant">1 sao</span>
+<div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full" style="width: 0%;"></div>
+</div>
+<span class="w-10 text-right font-semibold text-on-surface">0%</span>
+</div>
+</div>
+</div>
+<!-- Review Submission Form Box -->
+<div class="bg-surface-container-low p-space-md rounded-xl flex flex-col gap-space-sm">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Để lại nhận xét của bạn</span>
+<!-- Interactive Star Selector -->
+<div class="flex items-center gap-space-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">Chất lượng học thuật:</span>
+<div class="flex items-center text-outline cursor-pointer" id="ratingStars">
+<span class="material-symbols-outlined text-[24px] hover:text-tertiary-container transition-colors text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[24px] hover:text-tertiary-container transition-colors text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[24px] hover:text-tertiary-container transition-colors text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[24px] hover:text-tertiary-container transition-colors text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[24px] hover:text-tertiary-container transition-colors text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<textarea class="w-full p-space-sm rounded-lg bg-surface-container-lowest text-on-surface font-body-sm text-body-sm outline-none placeholder:text-outline focus:bg-surface-container-lowest shadow-sm" placeholder="Chia sẻ cảm nhận về tính chuẩn xác, đề thi có khớp với đề thực tế kỳ này không, hoặc đặt câu hỏi về các bước giải..." rows="3"></textarea>
+<div class="flex justify-end">
+<button class="bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg px-space-md py-space-xs rounded shadow-sm transition-colors">
+          Gửi đánh giá &amp; thảo luận
+        </button>
+</div>
+</div>
+<!-- Threaded Comments -->
+<div class="flex flex-col gap-space-lg">
+<!-- Comment 1 (With Author Threaded Reply) -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-start gap-space-sm">
+<img class="w-10 h-10 rounded-full object-cover shrink-0" data-alt="Chân dung nam sinh viên Việt Nam phong cách nghiêm túc học sinh giỏi đeo tai nghe học bài trong góc học tập" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn0_LsGfvR3TxeEyBVnuxuCPZSZ6hoaUwFEqs7I7-bz06ngC0LLFeSMRe1R4VZ-VodEvUATJrQLhDUE-AfqyqwJtx3DIHHmFKGKuGFVz3YtEedScHnpG3-0pKiZ1HB8GdnVYzT_8qp3XoJPN77SNIaDQp26dWasoWUJIaU5rsSWA5wMe9pGYRHdWw6yS1CPQ1nBHcvxetfBqS-24rCcbpSLNOIoRb-0Ad8j1MrPp2igdSIGlNTKK0hJg"/>
+<div class="flex flex-col flex-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-md font-semibold text-on-surface">Đức Hoàng</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">K63 Viện Ngân Hàng - Tài Chính</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">2 ngày trước</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mt-1">
+              Bạn ơi cho mình hỏi ở câu 4 đề thi 2023 thì bước tính p-value dùng kiểm định White hay Breusch-Pagan vậy ạ? Tài liệu giải cực kỳ chi tiết, mình vừa thi giữa kỳ xong trúng 2 câu y hệt số liệu luôn! Cảm ơn bạn rất nhiều!
+            </p>
+<div class="flex items-center gap-space-md mt-space-xs font-label-sm text-label-sm text-on-surface-variant">
+<button class="flex items-center gap-space-xxs hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">thumb_up</span>
+<span>Hữu ích (18)</span>
+</button>
+<button class="flex items-center gap-space-xxs hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">reply</span>
+<span>Trả lời</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Threaded Reply from Author (Thảo My) -->
+<div class="ml-12 pl-space-md bg-surface-container-low p-space-sm rounded-lg flex items-start gap-space-sm">
+<img class="w-8 h-8 rounded-full object-cover shrink-0" data-alt="Ảnh avatar đại diện tác giả Thảo My nữ sinh NEU phong cách trẻ trung năng động" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDR6l5k1OhAT6VGNK3_PzF2LjMkXtut4F03f-jKOpkqK5d3UvWKd8gHYLjStfoo2x1MksZu9EToXOokLzDwsv7Ns7UA1krzlTTIdV0e6CTYmbuqSTDUi29KFmdd9yMFAD-yvjQPV7bz71jRRQQhqivCESMZ-SGLiWD82QfrVuej6iWrrKnZyuGZ9dihPbZQF-oc_Jh0venDKQPpd_FPH3rBU1lk4JGimVsNNLGeNMSbUSDvM389iCkZRg"/>
+<div class="flex flex-col flex-1">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-sm font-semibold text-primary">Thảo My</span>
+<span class="px-1.5 py-0.2 bg-primary text-on-primary rounded text-[10px] font-bold">Tác giả</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant ml-auto">1 ngày trước</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-1">
+              Chào Hoàng nhé! Câu 4 mình dùng kiểm định White dạng tổng quát bạn nhé. Trong trang 18 mình có ghi chú kỹ phần kiểm tra các tích chéo giữa các biến và so sánh giá trị Chi-square tra bảng. Bạn xem thêm phần công thức mình đóng khung xanh nha!
+            </p>
+</div>
+</div>
+</div>
+<!-- Comment 2 -->
+<div class="flex items-start gap-space-sm">
+<img class="w-10 h-10 rounded-full object-cover shrink-0" data-alt="Chân dung sinh viên đại học Việt Nam nữ tính vui vẻ đeo kính cận ngồi ở bàn học" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCheth8La5NkeOVgb5gbOp9qdXPhyUtxrql3NBZPeg1NGZuvjpOcXVeoohMgbS4z2zktEY4q31QoU09TSlV89I5a1A2aviewmQBXeChYzPECAc7Zfy-S5oL6ouPphE2_BVWKZ69qJS1U9QZ0infDnNKozUsyyo7Ru6obulKcB956PM8IzpaMRbdZaH3iXH74yyVtHfYN2gSCK29Fqzi_DJIEx290poBM0MdcTfmJ1W5bWlxbHsyPPsZg"/>
+<div class="flex flex-col flex-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-md font-semibold text-on-surface">Phương Linh</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">K62 Quản Trị Kinh Doanh NEU</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">4 ngày trước</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mt-1">
+            Tài liệu quá đỉnh, phần phân tích kết quả Stata và giải thích ý nghĩa hệ số hồi quy viết cực kỳ mạch lạc, người mất gốc đọc cũng hiểu được. Cảm ơn bạn My nhiều nhé!
+          </p>
+<div class="flex items-center gap-space-md mt-space-xs font-label-sm text-label-sm text-on-surface-variant">
+<button class="flex items-center gap-space-xxs hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">thumb_up</span>
+<span>Hữu ích (24)</span>
+</button>
+<button class="flex items-center gap-space-xxs hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">reply</span>
+<span>Trả lời</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Comment 3 -->
+<div class="flex items-start gap-space-sm">
+<img class="w-10 h-10 rounded-full object-cover shrink-0" data-alt="Chân dung sinh viên nam năng động với áo đồng phục trường đại học tại Hà Nội phong cách chụp profile chuyên nghiệp" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhSebZV4YrwRRoUsHUXIM1F_ZTu8fWJ2sXcaNUuADWT0CqQSoP35RMaHa71dZJ-hYoLAgI0L429CMq5JffSTI6shARahsD2FLVTKZ7ekandjACflJY0-yWhH-tyEWn2-gLxVDFsjqNrCPgrdVKnurndpT1u_ecoDlRY9nYpJ7Q28JV9jYWHltpmJL8VsozxdGeqzJONHMcrdB5F5SWKtbj6dnXKQYcc2DPMeehyYoIvnMepLfIDs07aQ"/>
+<div class="flex flex-col flex-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-md font-semibold text-on-surface">Tuấn Kiệt</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Khoa Kinh Tế Quốc Tế</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">1 tuần trước</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mt-1">
+            Bộ đề này có kèm file dữ liệu thực hành chạy Stata không bạn ơi? Nếu có thì tuyệt vời quá ạ.
+          </p>
+<div class="flex items-center gap-space-md mt-space-xs font-label-sm text-label-sm text-on-surface-variant">
+<button class="flex items-center gap-space-xxs hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">thumb_up</span>
+<span>Hữu ích (5)</span>
+</button>
+<button class="flex items-center gap-space-xxs hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">reply</span>
+<span>Trả lời</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Client-side Interactive Micro-Interactions -->
+<script>
+  (function() {
+    // 1. Favorite Bookmark toggle
+    const favBtn = document.getElementById('favoriteBtn');
+    const favIcon = document.getElementById('favoriteIcon');
+    const favText = document.getElementById('favoriteText');
+    let isFav = false;
+
+    if (favBtn) {
+      favBtn.addEventListener('click', function() {
+        isFav = !isFav;
+        if (isFav) {
+          favIcon.style.fontVariationSettings = "'FILL' 1";
+          favIcon.classList.add('text-primary');
+          favText.textContent = 'Đã lưu vào Yêu thích';
+          favBtn.classList.add('bg-surface-container');
+        } else {
+          favIcon.style.fontVariationSettings = "'FILL' 0";
+          favIcon.classList.remove('text-primary');
+          favText.textContent = 'Lưu vào mục Yêu thích';
+          favBtn.classList.remove('bg-surface-container');
+        }
+      });
+    }
+
+    // 2. Zoom Controls
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    const zoomLabel = document.getElementById('zoomLabel');
+    const viewPort = document.getElementById('viewerViewport');
+    let zoomLevel = 100;
+
+    function applyZoom(delta) {
+      const nextZoom = Math.min(Math.max(zoomLevel + delta, 80), 130);
+      zoomLevel = nextZoom;
+      zoomLabel.textContent = zoomLevel + '%';
+      if (viewPort) {
+        viewPort.style.transform = `scale(${zoomLevel / 100})`;
+      }
+    }
+
+    if (zoomInBtn) zoomInBtn.addEventListener('click', () => applyZoom(10));
+    if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => applyZoom(-10));
+
+    // 3. Page Navigator Indicator
+    let currentPage = 3;
+    const pageIndicator = document.getElementById('pageIndicator');
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          pageIndicator.textContent = 'Trang ' + currentPage;
+        }
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        if (currentPage < 5) {
+          currentPage++;
+          pageIndicator.textContent = 'Trang ' + currentPage;
+        }
+      });
+    }
+  })();
+</script></main><footer class="w-full bg-surface-container-low border-t border-outline-variant/30 mt-space-2xl"><div class="max-w-[80rem] mx-auto px-gutter-mobile lg:px-gutter-desktop py-space-2xl"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-xl"><div class="flex flex-col gap-space-sm"><div class="flex items-center gap-space-xs mb-space-xs"><img alt="Logo Học Liệu Số" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBy1Iw5FZMPN2P92dYDO4Llsuj1rZcZvL3evNQ2eiBgIUSywlav3g27KllMjCfaxjuh1XyuHO0lFwl_AUGtrOpKg3CdzfXfiuC0ANkPMEdDbzXs8x4REzT4nzAnCdI_zzM652yqL5tIm8EsaNVzQQ-ltQ-zC44XNsCGfUWBROAzOXl89ubV3-uMIaysSeLRdnXt6wfORWbPdf_xGu4PlEbM1SteFYw98CnshPdan45-4FOH3pQjNSaoFA"/><span class="font-headline-md text-headline-md text-primary font-bold">Học Liệu Số</span></div><p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">Hệ sinh thái lưu trữ, tìm kiếm và chia sẻ tài liệu học tập, giáo trình, đề thi chất lượng cao dành riêng cho sinh viên và giảng viên đại học toàn quốc.</p><div class="flex items-center gap-space-xs text-on-surface-variant mt-space-xs"><span class="material-symbols-outlined text-[18px] text-tertiary-container">verified</span><span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">Kiểm định chất lượng học thuật</span></div></div><div class="flex flex-col gap-space-xs"><h4 class="font-headline-sm text-headline-sm text-on-surface mb-space-xs">Về Học Liệu Số</h4><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Giới thiệu nền tảng</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Quy chế chia sẻ học liệu</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Điều khoản dịch vụ</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Chính sách bản quyền DMCA</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Bảo mật thông tin sinh viên</a></div><div class="flex flex-col gap-space-xs"><h4 class="font-headline-sm text-headline-sm text-on-surface mb-space-xs">Khám phá trường học</h4><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">ĐHQG Hà Nội (VNU-HN)</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">ĐHQG TP.HCM (VNU-HCM)</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">ĐH Bách Khoa Hà Nội &amp; TP.HCM</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">ĐH Kinh tế Quốc dân (NEU)</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">ĐH Ngoại Thương (FTU)</a></div><div class="flex flex-col gap-space-xs"><h4 class="font-headline-sm text-headline-sm text-on-surface mb-space-xs">Hỗ trợ sinh viên</h4><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Hướng dẫn tải tài liệu &amp; tích điểm</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Câu hỏi thường gặp (FAQ)</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Trung tâm hỗ trợ học vụ 24/7</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Báo cáo tài liệu vi phạm</a><div class="pt-space-xs"><span class="font-label-md text-label-md text-on-surface font-semibold block mb-space-xxs">Kết nối học thuật</span><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[20px] text-on-surface-variant cursor-pointer hover:text-primary transition-colors">forum</span><span class="material-symbols-outlined text-[20px] text-on-surface-variant cursor-pointer hover:text-primary transition-colors">mail</span><span class="material-symbols-outlined text-[20px] text-on-surface-variant cursor-pointer hover:text-primary transition-colors">share</span></div></div></div></div><div class="mt-space-2xl pt-space-md border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-space-sm"><p class="font-body-sm text-body-sm text-on-surface-variant text-center sm:text-left">© 2025 Học Liệu Số Platform. Bản quyền thuộc về cộng đồng sinh viên &amp; giảng viên Việt Nam.</p><p class="font-label-sm text-label-sm text-on-surface-variant text-center sm:text-right">Xây dựng vì sự phát triển giáo dục đại học công khai &amp; phi lợi nhuận.</p></div></div></footer></body></html>

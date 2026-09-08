@@ -1,0 +1,556 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  STUDENT
+  CONTRIBUTOR
+  MODERATOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum DocumentType {
+  TEXTBOOK
+  EXAM
+  LECTURE_NOTE
+  SUMMARY
+  THESIS
+  RESEARCH_PAPER
+  ASSIGNMENT
+  OTHER
+}
+
+enum DocumentStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+enum Visibility {
+  PUBLIC
+  UNLISTED
+  PRIVATE
+}
+
+enum FileFormat {
+  PDF
+  DOC
+  DOCX
+  PPT
+  PPTX
+  XLS
+  XLSX
+  ZIP
+  OTHER
+}
+
+enum CommentStatus {
+  VISIBLE
+  HIDDEN
+  DELETED
+}
+
+enum ReviewDecision {
+  APPROVED
+  REJECTED
+  CHANGES_REQUESTED
+}
+
+enum ReportReason {
+  COPYRIGHT
+  INAPPROPRIATE
+  INCORRECT_INFORMATION
+  SPAM
+  BROKEN_FILE
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum NotificationType {
+  DOCUMENT_APPROVED
+  DOCUMENT_REJECTED
+  COMMENT_REPLY
+  DOCUMENT_COMMENT
+  SYSTEM
+}
+
+enum ProcessingStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum FileScanStatus {
+  PENDING
+  CLEAN
+  INFECTED
+  FAILED
+}
+
+model User {
+  id              String     @id @default(cuid())
+  email           String     @unique
+  passwordHash    String
+  fullName        String
+  username        String?    @unique
+  avatarUrl       String?
+  bio             String?    @db.Text
+  role            UserRole   @default(STUDENT)
+  status          UserStatus @default(ACTIVE)
+  universityId    String?
+  facultyId       String?
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  deletedAt       DateTime?
+
+  university         University?             @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  faculty            Faculty?                @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  uploadedDocuments  Document[]              @relation("DocumentUploader")
+  comments           Comment[]
+  ratings            Rating[]
+  favorites          Favorite[]
+  downloads          Download[]
+  views              DocumentView[]
+  reviews            DocumentReview[]
+  reports            Report[]                @relation("ReportReporter")
+  resolvedReports    Report[]                @relation("ReportResolver")
+  notifications      Notification[]          @relation("NotificationRecipient")
+  actedNotifications Notification[]          @relation("NotificationActor")
+  refreshTokens      RefreshToken[]
+  auditLogs          AuditLog[]
+  createdVersions    DocumentVersion[]
+  processingJobs     DocumentProcessingJob[] @relation("ProcessingJobRequester")
+
+  @@index([universityId])
+  @@index([facultyId])
+  @@index([role, status])
+  @@map("users")
+}
+
+model University {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  shortName String?
+  logoUrl   String?
+  website   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+  faculties Faculty[]
+  documents Document[]
+
+  @@index([name])
+  @@map("universities")
+}
+
+model Faculty {
+  id           String   @id @default(cuid())
+  universityId String
+  code         String?
+  name         String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  university University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  users      User[]
+  subjects   Subject[]
+  documents  Document[]
+
+  @@unique([universityId, name])
+  @@index([universityId])
+  @@map("faculties")
+}
+
+model Subject {
+  id          String   @id @default(cuid())
+  facultyId   String?
+  code        String
+  name        String
+  description String?  @db.Text
+  credits     Int?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  faculty   Faculty?   @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  documents Document[]
+
+  @@unique([facultyId, code])
+  @@index([code])
+  @@index([name])
+  @@map("subjects")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  parentId    String?
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  icon        String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parent    Category?          @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children  Category[]         @relation("CategoryTree")
+  documents DocumentCategory[]
+
+  @@index([parentId, sortOrder])
+  @@map("categories")
+}
+
+model Document {
+  id               String           @id @default(cuid())
+  uploaderId       String
+  universityId     String?
+  facultyId        String?
+  subjectId        String?
+  title            String
+  slug             String           @unique
+  description      String?          @db.Text
+  documentType     DocumentType
+  fileFormat       FileFormat
+  fileUrl          String
+  thumbnailUrl     String?
+  originalFileName String
+  fileSizeBytes    BigInt
+  pageCount        Int?
+  academicYear     String?
+  language         String           @default("vi")
+  status           DocumentStatus   @default(DRAFT)
+  visibility       Visibility       @default(PUBLIC)
+  rejectionReason  String?          @db.Text
+  isVerified       Boolean          @default(false)
+  verifiedAt       DateTime?
+  publishedAt      DateTime?
+  downloadCount    Int              @default(0)
+  viewCount        Int              @default(0)
+  commentCount     Int              @default(0)
+  ratingAverage    Decimal          @default(0) @db.Decimal(3, 2)
+  ratingCount      Int              @default(0)
+  processingStatus ProcessingStatus @default(QUEUED)
+  processingError  String?          @db.Text
+  checksum         String?
+  extractedText    String?          @db.Text
+  metadata         Json?
+  citationCount    Int              @default(0)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  deletedAt        DateTime?
+
+  uploader       User                    @relation("DocumentUploader", fields: [uploaderId], references: [id], onDelete: Restrict)
+  university     University?             @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  faculty        Faculty?                @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  subject        Subject?                @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  categories     DocumentCategory[]
+  tags           DocumentTag[]
+  comments       Comment[]
+  ratings        Rating[]
+  favorites      Favorite[]
+  downloads      Download[]
+  views          DocumentView[]
+  reviews        DocumentReview[]
+  reports        Report[]
+  versions       DocumentVersion[]
+  processingJobs DocumentProcessingJob[]
+  notifications  Notification[]
+
+  @@index([status, visibility, createdAt])
+  @@index([documentType, status])
+  @@index([universityId, facultyId, subjectId])
+  @@index([academicYear])
+  @@index([ratingAverage, ratingCount])
+  @@index([downloadCount])
+  @@index([title])
+  @@index([processingStatus, createdAt])
+  @@index([checksum])
+  @@map("documents")
+}
+
+model DocumentCategory {
+  documentId String
+  categoryId String
+  assignedAt DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([documentId, categoryId])
+  @@index([categoryId])
+  @@map("document_categories")
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  documents DocumentTag[]
+
+  @@map("tags")
+}
+
+model DocumentTag {
+  documentId String
+  tagId      String
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([documentId, tagId])
+  @@index([tagId])
+  @@map("document_tags")
+}
+
+model Comment {
+  id         String        @id @default(cuid())
+  documentId String
+  authorId   String?
+  parentId   String?
+  content    String        @db.Text
+  status     CommentStatus @default(VISIBLE)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  deletedAt  DateTime?
+
+  document      Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  author        User?          @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  parent        Comment?       @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies       Comment[]      @relation("CommentReplies")
+  reports       Report[]
+  notifications Notification[]
+
+  @@index([documentId, status, createdAt])
+  @@index([parentId])
+  @@index([authorId])
+  @@map("comments")
+}
+
+model Rating {
+  id         String   @id @default(cuid())
+  documentId String
+  userId     String
+  score      Int
+  review     String?  @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, userId])
+  @@index([documentId, score])
+  @@map("ratings")
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  documentId String
+  userId     String
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, userId])
+  @@index([userId, createdAt])
+  @@map("favorites")
+}
+
+model Download {
+  id         String   @id @default(cuid())
+  documentId String
+  userId     String?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([documentId, createdAt])
+  @@index([userId, createdAt])
+  @@map("downloads")
+}
+
+model DocumentView {
+  id         String   @id @default(cuid())
+  documentId String
+  userId     String?
+  sessionId  String?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([documentId, createdAt])
+  @@index([userId, createdAt])
+  @@map("document_views")
+}
+
+model DocumentReview {
+  id         String         @id @default(cuid())
+  documentId String
+  reviewerId String
+  decision   ReviewDecision
+  note       String?        @db.Text
+  createdAt  DateTime       @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  reviewer User     @relation(fields: [reviewerId], references: [id], onDelete: Restrict)
+
+  @@index([documentId, createdAt])
+  @@index([reviewerId, createdAt])
+  @@map("document_reviews")
+}
+
+model DocumentVersion {
+  id               String     @id @default(cuid())
+  documentId       String
+  createdById      String
+  versionNumber    Int
+  fileUrl          String
+  originalFileName String
+  fileFormat       FileFormat
+  fileSizeBytes    BigInt
+  checksum         String?
+  pageCount        Int?
+  changeNote       String?    @db.Text
+  createdAt        DateTime   @default(now())
+
+  document  Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdBy User     @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@unique([documentId, versionNumber])
+  @@index([documentId, createdAt])
+  @@index([createdById, createdAt])
+  @@map("document_versions")
+}
+
+model DocumentProcessingJob {
+  id            String           @id @default(cuid())
+  documentId    String
+  requestedById String?
+  status        ProcessingStatus @default(QUEUED)
+  scanStatus    FileScanStatus   @default(PENDING)
+  extractedText String?          @db.Text
+  result        Json?
+  errorMessage  String?          @db.Text
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime         @default(now())
+
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  requestedBy User?    @relation("ProcessingJobRequester", fields: [requestedById], references: [id], onDelete: SetNull)
+
+  @@index([documentId, createdAt])
+  @@index([status, createdAt])
+  @@map("document_processing_jobs")
+}
+
+model Report {
+  id             String       @id @default(cuid())
+  documentId     String?
+  commentId      String?
+  reporterId     String
+  resolvedById   String?
+  reason         ReportReason
+  description    String?      @db.Text
+  status         ReportStatus @default(OPEN)
+  resolutionNote String?      @db.Text
+  createdAt      DateTime     @default(now())
+  resolvedAt     DateTime?
+
+  document   Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  comment    Comment?  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reporter   User      @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Restrict)
+  resolvedBy User?     @relation("ReportResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([documentId])
+  @@index([commentId])
+  @@map("reports")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  recipientId String
+  actorId     String?
+  type        NotificationType
+  title       String
+  message     String           @db.Text
+  documentId  String?
+  commentId   String?
+  isRead      Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  readAt      DateTime?
+
+  recipient User      @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor     User?     @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  document  Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  comment   Comment?  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, isRead, createdAt])
+  @@map("notifications")
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@map("refresh_tokens")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId, createdAt])
+  @@index([userId, createdAt])
+  @@map("audit_logs")
+}
