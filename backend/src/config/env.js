@@ -19,4 +19,5 @@ module.exports = {
   refreshTokenExpiresInDays: Number(process.env.JWT_REFRESH_EXPIRES_IN_DAYS || 30),
   uploadDir: process.env.UPLOAD_DIR || 'uploads',
   publishImmediately: process.env.PUBLISH_DOCUMENTS_IMMEDIATELY !== 'false',
+  purgeCronSchedule: process.env.PURGE_CRON_SCHEDULE || '0 3 * * *',
 };

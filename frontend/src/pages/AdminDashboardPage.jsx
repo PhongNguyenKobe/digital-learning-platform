@@ -1,37 +1,518 @@
 import { useEffect, useState } from 'react'
-import { fetchAdminReports, fetchAdminUsers, updateAdminReport, updateDocumentStatus } from '../services/api'
+import { useNavigate } from 'react-router-dom'
+import {
+  fetchAdminStats,
+  fetchAdminReports,
+  updateAdminReport,
+  fetchAdminAllDocuments,
+  updateAdminDocumentDetails,
+  updateDocumentStatus,
+  deleteAdminDocument,
+  restoreAdminDocument,
+  fetchAdminUsers,
+  createAdminUser,
+  updateAdminUserDetails,
+  deleteAdminUser,
+  fetchAdminUniversities,
+  createAdminUniversity,
+  updateAdminUniversity,
+  deleteAdminUniversity,
+  fetchAdminFaculties,
+  createAdminFaculty,
+  updateAdminFaculty,
+  deleteAdminFaculty,
+  fetchAdminSubjects,
+  createAdminSubject,
+  updateAdminSubject,
+  deleteAdminSubject,
+  fetchAdminCategories,
+  createAdminCategory,
+  updateAdminCategory,
+  deleteAdminCategory,
+  fetchAdminAuditLogs,
+  purgeDeletedAdmin,
+  fetchCurrentUser,
+} from '../services/api'
 
-function AdminDashboardPage() {
-  const [reports, setReports] = useState([])
-  const [users, setUsers] = useState([])
-  const [notice, setNotice] = useState('')
+import AdminSidebar from '../components/admin/AdminSidebar'
+import AdminHeader from '../components/admin/AdminHeader'
+import AdminMetrics from '../components/admin/AdminMetrics'
+import OverviewTab from '../components/admin/tabs/OverviewTab'
+import RiskQueueTab from '../components/admin/tabs/RiskQueueTab'
+import DocumentsTab from '../components/admin/tabs/DocumentsTab'
+import UsersTab from '../components/admin/tabs/UsersTab'
+import CatalogsTab from '../components/admin/tabs/CatalogsTab'
+import AuditLogsTab from '../components/admin/tabs/AuditLogsTab'
+import SettingsTab from '../components/admin/tabs/SettingsTab'
 
-  async function load() {
-    try { const [reportResponse, userResponse] = await Promise.all([fetchAdminReports({ limit: 50 }), fetchAdminUsers({ limit: 8 })]); setReports(reportResponse.data || []); setUsers(userResponse.data || []) } catch (error) { setNotice(error.response?.data?.error?.message || 'Bạn cần đăng nhập bằng tài khoản Admin.') }
+import EditDocumentModal from '../components/admin/modals/EditDocumentModal'
+import EditUserModal from '../components/admin/modals/EditUserModal'
+import CreateUserModal from '../components/admin/modals/CreateUserModal'
+import CatalogModal from '../components/admin/modals/CatalogModal'
+
+export default function AdminDashboardPage() {
+  const navigate = useNavigate()
+
+  // Navigation State
+  const [activeTab, setActiveTab] = useState('overview')
+
+  // Notification Toast
+  const [notice, setNotice] = useState(null)
+  function showNotice(message, type = 'info') {
+    setNotice({ message, type })
+    setTimeout(() => setNotice(null), 5000)
   }
+
+  // Admin Profile & Loading State
+  const [currentUser, setCurrentUser] = useState(null)
+  const [purging, setPurging] = useState(false)
+
+  // Core Data States
+  const [stats, setStats] = useState({
+    totalDocuments: 0,
+    pendingRisk: 0,
+    pendingReports: 0,
+    totalUsers: 0,
+    cleanRate: '99.8%',
+    highTrustRate: '98.4%',
+  })
+  const [reports, setReports] = useState([])
+  const [documents, setDocuments] = useState([])
+  const [docSearch, setDocSearch] = useState('')
+  const [users, setUsers] = useState([])
+  const [userSearch, setUserSearch] = useState('')
+
+  // Catalog States
+  const [universities, setUniversities] = useState([])
+  const [faculties, setFaculties] = useState([])
+  const [subjects, setSubjects] = useState([])
+  const [categories, setCategories] = useState([])
+
+  // Audit Logs
+  const [auditLogs, setAuditLogs] = useState([])
+
+  // Modal State: { type: string, data?: any }
+  const [modalState, setModalState] = useState(null)
+
+  // Initial Load (Profile, Stats, Reports)
   useEffect(() => {
     let cancelled = false
-    async function initialLoad() {
+    async function loadInitial() {
       try {
-        const [reportResponse, userResponse] = await Promise.all([fetchAdminReports({ limit: 50 }), fetchAdminUsers({ limit: 8 })])
-        if (!cancelled) { setReports(reportResponse.data || []); setUsers(userResponse.data || []) }
-      } catch (error) {
-        if (!cancelled) setNotice(error.response?.data?.error?.message || 'Bạn cần đăng nhập bằng tài khoản Admin.')
+        const [meRes, statsRes, repRes] = await Promise.all([
+          fetchCurrentUser().catch(() => null),
+          fetchAdminStats().catch(() => null),
+          fetchAdminReports({ limit: 50 }).catch(() => null),
+        ])
+        if (!cancelled) {
+          if (meRes?.data) setCurrentUser(meRes.data)
+          if (statsRes?.data) setStats(statsRes.data)
+          if (repRes?.data) setReports(repRes.data)
+        }
+      } catch (err) {
+        if (!cancelled) {
+          showNotice(err.response?.data?.error?.message || 'Lỗi khi tải dữ liệu bảng điều khiển.', 'error')
+        }
       }
     }
-    initialLoad()
+    loadInitial()
     return () => { cancelled = true }
   }, [])
 
-  async function resolveReport(id, status) { try { await updateAdminReport(id, { status, resolutionNote: status === 'RESOLVED' ? 'Đã kiểm tra và xử lý.' : 'Report đã được đóng.' }); setReports((current) => current.filter((item) => item.id !== id)); setNotice('Đã cập nhật report.') } catch (error) { setNotice(error.response?.data?.error?.message || 'Không thể cập nhật report.') } }
-  async function moderateDocument(id, status) { try { await updateDocumentStatus(id, { status, note: status === 'PUBLISHED' ? 'Đã kiểm duyệt nội dung.' : 'Tài liệu cần được chỉnh sửa hoặc gỡ bỏ.' }); setNotice(`Đã chuyển tài liệu sang ${status}.`); load() } catch (error) { setNotice(error.response?.data?.error?.message || 'Không thể cập nhật tài liệu.') } }
+  // Tab-Driven Data Fetching
+  useEffect(() => {
+    let cancelled = false
+    async function loadTabData() {
+      try {
+        if (activeTab === 'documents') {
+          const res = await fetchAdminAllDocuments({ limit: 100, query: docSearch || undefined })
+          if (!cancelled && res.data) setDocuments(res.data)
+        } else if (activeTab === 'users') {
+          const res = await fetchAdminUsers({ limit: 100, query: userSearch || undefined })
+          if (!cancelled && res.data) setUsers(res.data)
+        } else if (['universities', 'faculties', 'subjects', 'categories'].includes(activeTab)) {
+          const [uRes, fRes, sRes, cRes] = await Promise.all([
+            fetchAdminUniversities({ limit: 100 }).catch(() => ({ data: [] })),
+            fetchAdminFaculties({ limit: 100 }).catch(() => ({ data: [] })),
+            fetchAdminSubjects({ limit: 100 }).catch(() => ({ data: [] })),
+            fetchAdminCategories({ limit: 100 }).catch(() => ({ data: [] })),
+          ])
+          if (!cancelled) {
+            setUniversities(uRes.data || [])
+            setFaculties(fRes.data || [])
+            setSubjects(sRes.data || [])
+            setCategories(cRes.data || [])
+          }
+        } else if (activeTab === 'audit_logs') {
+          const res = await fetchAdminAuditLogs({ limit: 60 }).catch(() => ({ data: [] }))
+          if (!cancelled && res.data) setAuditLogs(res.data)
+        } else if (activeTab === 'overview') {
+          const [sRes, rRes] = await Promise.all([
+            fetchAdminStats().catch(() => null),
+            fetchAdminReports({ limit: 20 }).catch(() => null),
+          ])
+          if (!cancelled) {
+            if (sRes?.data) setStats(sRes.data)
+            if (rRes?.data) setReports(rRes.data)
+          }
+        }
+      } catch (err) {
+        if (!cancelled) {
+          showNotice(err.response?.data?.error?.message || 'Không thể tải dữ liệu.', 'error')
+        }
+      }
+    }
+    loadTabData()
+    return () => { cancelled = true }
+  }, [activeTab, docSearch, userSearch])
 
-  return <div className="min-h-screen bg-[#f9f9ff]"><div className="mx-auto max-w-7xl space-y-8 px-6 py-10 lg:px-8"><div className="flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><span className="rounded-full bg-[#dde1ff] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-blue-800">Admin console</span><h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Trung tâm kiểm duyệt</h1><p className="mt-2 text-sm text-slate-500">Theo dõi báo cáo, nội dung cần xử lý và thành viên trong hệ thống.</p></div><button className="rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700" onClick={load} type="button">↻ Làm mới dữ liệu</button></div>{notice && <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800">{notice}</div>}
-    <div className="grid gap-4 sm:grid-cols-3"><Metric label="Report đang mở" value={reports.length} /><Metric label="Người dùng" value={users.length} /><Metric label="Cần ưu tiên" value={reports.filter((item) => item.reason === 'COPYRIGHT' || item.reason === 'INAPPROPRIATE').length} /></div>
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,1fr)]"><section className="rounded-xl border border-slate-200 bg-white shadow-sm"><div className="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div><h2 className="font-bold text-slate-900">Hàng đợi báo cáo</h2><p className="mt-1 text-xs text-slate-500">Các báo cáo OPEN và IN_REVIEW cần xử lý.</p></div><span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">{reports.length} đang chờ</span></div><div className="divide-y divide-slate-100">{reports.map((item) => <article className="p-5" key={item.id}><div className="flex flex-col justify-between gap-3 sm:flex-row"><div><div className="flex flex-wrap items-center gap-2"><span className="rounded bg-red-50 px-2 py-1 text-[10px] font-bold uppercase text-red-700">{item.reason}</span><span className="text-xs text-slate-400">{item.status}</span></div><h3 className="mt-2 font-bold text-slate-900">{item.document?.title || 'Báo cáo bình luận'}</h3><p className="mt-1 text-sm text-slate-500">{item.description || 'Không có mô tả bổ sung.'}</p><p className="mt-2 text-xs text-slate-400">Người báo cáo: {item.reporter?.fullName}</p></div><div className="flex shrink-0 gap-2 self-start"><button className="rounded-lg bg-emerald-700 px-3 py-2 text-xs font-bold text-white" onClick={() => resolveReport(item.id, 'RESOLVED')} type="button">Xử lý</button><button className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600" onClick={() => resolveReport(item.id, 'DISMISSED')} type="button">Bỏ qua</button></div></div>{item.document && <div className="mt-4 flex gap-2 border-t border-slate-100 pt-3"><button className="rounded-md bg-blue-800 px-3 py-2 text-xs font-bold text-white" onClick={() => moderateDocument(item.document.id, 'PUBLISHED')} type="button">Duyệt tài liệu</button><button className="rounded-md bg-red-700 px-3 py-2 text-xs font-bold text-white" onClick={() => moderateDocument(item.document.id, 'REJECTED')} type="button">Từ chối</button></div>}</article>)}{reports.length === 0 && <div className="p-10 text-center text-sm text-slate-500">Không có report cần xử lý.</div>}</div></section>
-      <section className="rounded-xl border border-slate-200 bg-white shadow-sm"><div className="border-b border-slate-100 px-5 py-4"><h2 className="font-bold text-slate-900">Quản lý người dùng</h2><p className="mt-1 text-xs text-slate-500">Danh sách thành viên mới nhất.</p></div><div className="divide-y divide-slate-100">{users.map((user) => <div className="flex items-center justify-between gap-3 p-4" key={user.id}><div className="min-w-0"><p className="truncate text-sm font-bold text-slate-900">{user.fullName}</p><p className="truncate text-xs text-slate-500">{user.email}</p></div><div className="text-right"><span className="block text-[10px] font-bold text-blue-800">{user.role}</span><span className={`text-[10px] font-semibold ${user.status === 'ACTIVE' ? 'text-emerald-700' : 'text-red-700'}`}>{user.status}</span></div></div>)}</div></section></div></div></div>
+  // --- ACTIONS: MODERATION ---
+  async function handleResolveReport(id, resolution, note = '') {
+    try {
+      await updateAdminReport(id, {
+        status: resolution === 'DISMISSED' ? 'DISMISSED' : 'RESOLVED',
+        resolutionNote: note || (resolution === 'DISMISSED' ? 'Báo cáo không có căn cứ.' : 'Đã thẩm định và xử lý.'),
+      })
+      setReports((prev) => prev.filter((r) => r.id !== id))
+      showNotice('Đã cập nhật trạng thái báo cáo vi phạm.', 'success')
+      fetchAdminStats().then((res) => res?.data && setStats(res.data))
+    } catch (err) {
+      showNotice(err.response?.data?.error?.message || 'Không thể cập nhật báo cáo.', 'error')
+    }
+  }
+
+  async function handleModerateDocument(docId, newStatus, reportId = null, reason = '') {
+    try {
+      await updateDocumentStatus(docId, {
+        status: newStatus,
+        note: reason || (newStatus === 'PUBLISHED' ? 'Học liệu hợp lệ, xuất bản chính thức.' : 'Thu hồi do vi phạm bản quyền / chính sách.'),
+      })
+      if (reportId) {
+        await updateAdminReport(reportId, {
+          status: 'RESOLVED',
+          resolutionNote: `Tài liệu đã được chuyển sang trạng thái ${newStatus}.`,
+        })
+        setReports((prev) => prev.filter((r) => r.id !== reportId))
+      }
+      setDocuments((prev) => prev.map((d) => (d.id === docId ? { ...d, status: newStatus } : d)))
+      showNotice(`Đã chuyển tài liệu sang trạng thái: ${newStatus}`, 'success')
+      fetchAdminStats().then((res) => res?.data && setStats(res.data))
+    } catch (err) {
+      showNotice(err.response?.data?.error?.message || 'Không thể cập nhật tài liệu.', 'error')
+    }
+  }
+
+  // --- ACTIONS: DOCUMENTS ---
+  async function handleDeleteDocument(docId) {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa (lưu trữ) tài liệu này?')) return
+    try {
+      await deleteAdminDocument(docId)
+      setDocuments((prev) => prev.filter((d) => d.id !== docId))
+      showNotice('Đã xóa mềm tài liệu thành công.', 'success')
+      fetchAdminStats().then((res) => res?.data && setStats(res.data))
+    } catch (err) {
+      showNotice(err.response?.data?.error?.message || 'Lỗi khi xóa tài liệu.', 'error')
+    }
+  }
+
+  async function handleSaveDocumentDetails(updatedData) {
+    try {
+      await updateAdminDocumentDetails(modalState.data.id, updatedData)
+      setDocuments((prev) => prev.map((d) => (d.id === modalState.data.id ? { ...d, ...updatedData } : d)))
+      setModalState(null)
+      showNotice('Đã cập nhật thông tin tài liệu thành công!', 'success')
+    } catch (err) {
+      showNotice(err.response?.data?.error?.message || 'Lỗi khi cập nhật tài liệu.', 'error')
+    }
+  }
+
+  // --- ACTIONS: USERS ---
+  async function handleSaveUserDetails(updatedData) {
+    try {
+      await updateAdminUserDetails(modalState.data.id, updatedData)
+      setUsers((prev) => prev.map((u) => (u.id === modalState.data.id ? { ...u, ...updatedData } : u)))
+      setModalState(null)
+      showNotice('Đã cập nhật tài khoản người dùng!', 'success')
+    } catch (err) {
+      showNotice(err.response?.data?.error?.message || 'Lỗi khi cập nhật người dùng.', 'error')
+    }
+  }
+
+  async function handleCreateUser(newData) {
+    try {
+      const res = await createAdminUser(newData)
+      setUsers((prev) => [res.data, ...prev])
+      setModalState(null)
+      showNotice('Đã tạo người dùng mới thành công!', 'success')
+      fetchAdminStats().then((sRes) => sRes?.data && setStats(sRes.data))
+    } catch (err) {
+      showNotice(err.response?.data?.error?.message || 'Lỗi khi tạo người dùng mới.', 'error')
+    }
+  }
+
+  async function handleDeleteUser(userId) {
+    if (!window.confirm('Xác nhận tạm khóa/xóa tài khoản người dùng này?')) return
+    try {
+      await deleteAdminUser(userId)
+      setUsers((prev) => prev.filter((u) => u.id !== userId))
+      showNotice('Đã xóa người dùng thành công.', 'success')
+      fetchAdminStats().then((sRes) => sRes?.data && setStats(sRes.data))
+    } catch (err) {
+      showNotice(err.response?.data?.error?.message || 'Lỗi khi xóa người dùng.', 'error')
+    }
+  }
+
+  async function handleQuickGrantTrust(userId) {
+    try {
+      await updateAdminUserDetails(userId, { trustScore: 95 })
+      setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, trustScore: 95 } : u)))
+      showNotice('Đã cấp quyền Đại sứ học liệu (Trust Score 95)!', 'success')
+    } catch (err) {
+      showNotice(err.response?.data?.error?.message || 'Không thể cấp quyền.', 'error')
+    }
+  }
+
+  // --- ACTIONS: CATALOGS ---
+  async function handleSaveCatalogItem(type, itemData, isEdit = false, id = null) {
+    try {
+      if (type === 'university') {
+        const res = isEdit ? await updateAdminUniversity(id, itemData) : await createAdminUniversity(itemData)
+        setUniversities((prev) => (isEdit ? prev.map((i) => (i.id === id ? res.data : i)) : [res.data, ...prev]))
+      } else if (type === 'faculty') {
+        const res = isEdit ? await updateAdminFaculty(id, itemData) : await createAdminFaculty(itemData)
+        setFaculties((prev) => (isEdit ? prev.map((i) => (i.id === id ? res.data : i)) : [res.data, ...prev]))
+      } else if (type === 'subject') {
+        const res = isEdit ? await updateAdminSubject(id, itemData) : await createAdminSubject(itemData)
+        setSubjects((prev) => (isEdit ? prev.map((i) => (i.id === id ? res.data : i)) : [res.data, ...prev]))
+      } else if (type === 'category') {
+        const res = isEdit ? await updateAdminCategory(id, itemData) : await createAdminCategory(itemData)
+        setCategories((prev) => (isEdit ? prev.map((i) => (i.id === id ? res.data : i)) : [res.data, ...prev]))
+      }
+      setModalState(null)
+      showNotice(`Đã lưu ${type} thành công!`, 'success')
+    } catch (err) {
+      showNotice(err.response?.data?.error?.message || 'Lỗi khi lưu dữ liệu danh mục.', 'error')
+    }
+  }
+
+  async function handleDeleteCatalogItem(type, id) {
+    if (!window.confirm('Xác nhận xóa mục này? Hành động không thể hoàn tác.')) return
+    try {
+      if (type === 'university') {
+        await deleteAdminUniversity(id)
+        setUniversities((prev) => prev.filter((i) => i.id !== id))
+      } else if (type === 'faculty') {
+        await deleteAdminFaculty(id)
+        setFaculties((prev) => prev.filter((i) => i.id !== id))
+      } else if (type === 'subject') {
+        await deleteAdminSubject(id)
+        setSubjects((prev) => prev.filter((i) => i.id !== id))
+      } else if (type === 'category') {
+        await deleteAdminCategory(id)
+        setCategories((prev) => prev.filter((i) => i.id !== id))
+      }
+      showNotice('Đã xóa mục danh mục thành công!', 'success')
+    } catch (err) {
+      showNotice(err.response?.data?.error?.message || 'Không thể xóa danh mục.', 'error')
+    }
+  }
+
+  // --- ACTIONS: PURGE ---
+  async function handleTriggerPurge(retentionDays = 30) {
+    if (!window.confirm(`Xác nhận dọn dẹp vĩnh viễn dữ liệu rác đã bị xóa quá ${retentionDays} ngày?`)) return
+    setPurging(true)
+    try {
+      const res = await purgeDeletedAdmin(retentionDays)
+      showNotice(res.message || 'Dọn dẹp dữ liệu rác thành công!', 'success')
+      fetchAdminStats().then((sRes) => sRes?.data && setStats(sRes.data))
+      if (activeTab === 'documents') {
+        fetchAdminAllDocuments({ limit: 100 }).then((dRes) => dRes?.data && setDocuments(dRes.data))
+      }
+    } catch (err) {
+      showNotice(err.response?.data?.error?.message || 'Không thể thực hiện purge rác.', 'error')
+    } finally {
+      setPurging(false)
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('hls_access_token')
+    localStorage.removeItem('hls_refresh_token')
+    window.dispatchEvent(new Event('hls-auth-changed'))
+    navigate('/dang-nhap')
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f9f9ff] text-[#141b2b]">
+      {/* Toast Notice */}
+      {notice && (
+        <div
+          className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl px-5 py-3 shadow-2xl transition-all ${
+            notice.type === 'error'
+              ? 'bg-[#ba1a1a] text-white'
+              : notice.type === 'success'
+              ? 'bg-[#00563a] text-white'
+              : 'bg-[#141b2b] text-white'
+          }`}
+        >
+          <span className="material-symbols-outlined text-[20px]">
+            {notice.type === 'error' ? 'error' : notice.type === 'success' ? 'check_circle' : 'info'}
+          </span>
+          <span className="text-sm font-medium">{notice.message}</span>
+          <button onClick={() => setNotice(null)} className="ml-2 text-white/80 hover:text-white">
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Main Admin Layout */}
+      <div className="mx-auto flex max-w-[85rem] flex-col gap-6 px-4 py-8 lg:flex-row lg:px-6">
+        {/* Left Dark Navy Academic Sidebar */}
+        <AdminSidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          reportsCount={reports.length}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+        />
+
+        {/* Right Content Workspace Area */}
+        <section className="flex flex-1 flex-col gap-6 min-w-0">
+          {/* Header */}
+          <AdminHeader activeTab={activeTab} />
+
+          {/* 4 Executive Metrics Cards */}
+          <AdminMetrics
+            stats={stats}
+            pendingRiskCount={reports.length || stats.pendingRisk}
+            pendingReportsCount={reports.filter((r) => r.status === 'PENDING').length}
+          />
+
+          {/* Tab Content Switching */}
+          {activeTab === 'overview' && (
+            <OverviewTab
+              reports={reports}
+              onNavigateTab={(tab) => {
+                if (tab === 'create_user_action') {
+                  setActiveTab('users')
+                  setModalState({ type: 'create_user' })
+                } else {
+                  setActiveTab(tab)
+                }
+              }}
+              onModerateDocument={handleModerateDocument}
+              onTriggerPurge={handleTriggerPurge}
+              purging={purging}
+            />
+          )}
+
+          {activeTab === 'risk_queue' && (
+            <RiskQueueTab
+              reports={reports}
+              onModerateDocument={handleModerateDocument}
+              onResolveReport={handleResolveReport}
+            />
+          )}
+
+          {activeTab === 'documents' && (
+            <DocumentsTab
+              documents={documents}
+              docSearch={docSearch}
+              setDocSearch={setDocSearch}
+              onModerateDocument={handleModerateDocument}
+              onDeleteDocument={handleDeleteDocument}
+              onOpenEditModal={(doc) => setModalState({ type: 'edit_doc', data: doc })}
+            />
+          )}
+
+          {activeTab === 'users' && (
+            <UsersTab
+              users={users}
+              userSearch={userSearch}
+              setUserSearch={setUserSearch}
+              onOpenCreateUserModal={() => setModalState({ type: 'create_user' })}
+              onOpenEditUserModal={(u) => setModalState({ type: 'edit_user', data: u })}
+              onDeleteUser={handleDeleteUser}
+              onQuickGrantTrust={handleQuickGrantTrust}
+            />
+          )}
+
+          {['universities', 'faculties', 'subjects', 'categories'].includes(activeTab) && (
+            <CatalogsTab
+              activeTab={activeTab}
+              universities={universities}
+              faculties={faculties}
+              subjects={subjects}
+              categories={categories}
+              onOpenCreateModal={(tab) => {
+                const map = {
+                  universities: 'create_university',
+                  faculties: 'create_faculty',
+                  subjects: 'create_subject',
+                  categories: 'create_category',
+                }
+                setModalState({ type: map[tab] })
+              }}
+              onOpenEditModal={(type, item) => setModalState({ type: `edit_${type}`, data: item })}
+              onDeleteCatalogItem={handleDeleteCatalogItem}
+            />
+          )}
+
+          {activeTab === 'audit_logs' && <AuditLogsTab auditLogs={auditLogs} />}
+
+          {activeTab === 'settings' && (
+            <SettingsTab onTriggerPurge={handleTriggerPurge} purging={purging} />
+          )}
+        </section>
+      </div>
+
+      {/* ================= MODALS ================= */}
+      {modalState?.type === 'edit_doc' && (
+        <EditDocumentModal
+          doc={modalState.data}
+          universities={universities}
+          faculties={faculties}
+          subjects={subjects}
+          categories={categories}
+          onClose={() => setModalState(null)}
+          onSave={handleSaveDocumentDetails}
+        />
+      )}
+
+      {modalState?.type === 'edit_user' && (
+        <EditUserModal
+          user={modalState.data}
+          onClose={() => setModalState(null)}
+          onSave={handleSaveUserDetails}
+        />
+      )}
+
+      {modalState?.type === 'create_user' && (
+        <CreateUserModal
+          onClose={() => setModalState(null)}
+          onSave={handleCreateUser}
+        />
+      )}
+
+      {(modalState?.type?.startsWith('create_') || modalState?.type?.startsWith('edit_')) &&
+        ['university', 'faculty', 'subject', 'category'].some((t) => modalState.type.includes(t)) && (
+          <CatalogModal
+            type={modalState.type.replace('create_', '').replace('edit_', '')}
+            isEdit={modalState.type.startsWith('edit_')}
+            data={modalState.data}
+            universities={universities}
+            faculties={faculties}
+            onClose={() => setModalState(null)}
+            onSave={(itemData) =>
+              handleSaveCatalogItem(
+                modalState.type.replace('create_', '').replace('edit_', ''),
+                itemData,
+                modalState.type.startsWith('edit_'),
+                modalState.data?.id
+              )
+            }
+          />
+        )}
+    </div>
+  )
 }
-
-function Metric({ label, value }) { return <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-sm font-semibold text-slate-500">{label}</p><strong className="mt-3 block text-3xl font-bold text-slate-900">{value}</strong></div> }
-
-export default AdminDashboardPage

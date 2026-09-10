@@ -56,22 +56,28 @@ async function uniqueSlug(title) {
 }
 
 const createDocument = asyncHandler(async (req, res) => {
-  if (!req.file) {
+  const documentFile = req.file || req.files?.file?.[0];
+  const thumbnailFile = req.files?.thumbnail?.[0];
+
+  if (!documentFile) {
     throw httpError(400, 'File tài liệu là bắt buộc và phải gửi bằng field `file`.');
   }
 
   const title = String(req.body.title || '').trim();
   const documentType = String(req.body.documentType || '').trim().toUpperCase();
   if (!title || title.length > 180) {
-    await fs.unlink(req.file.path).catch(() => {});
+    await fs.unlink(documentFile.path).catch(() => {});
+    if (thumbnailFile?.path) await fs.unlink(thumbnailFile.path).catch(() => {});
     throw httpError(400, 'Tiêu đề tài liệu là bắt buộc và tối đa 180 ký tự.');
   }
   if (!validDocumentTypes.has(documentType)) {
-    await fs.unlink(req.file.path).catch(() => {});
+    await fs.unlink(documentFile.path).catch(() => {});
+    if (thumbnailFile?.path) await fs.unlink(thumbnailFile.path).catch(() => {});
     throw httpError(400, 'documentType không hợp lệ.');
   }
   if (!req.body.universityId || !req.body.facultyId) {
-    await fs.unlink(req.file.path).catch(() => {});
+    await fs.unlink(documentFile.path).catch(() => {});
+    if (thumbnailFile?.path) await fs.unlink(thumbnailFile.path).catch(() => {});
     throw httpError(400, 'Trường Đại học và Khoa / Viện phụ trách là bắt buộc.');
   }
   const [university, faculty] = await Promise.all([
@@ -79,16 +85,18 @@ const createDocument = asyncHandler(async (req, res) => {
     prisma.faculty.findFirst({ where: { id: req.body.facultyId, isActive: true, universityId: req.body.universityId }, select: { id: true } }),
   ]);
   if (!university || !faculty) {
-    await fs.unlink(req.file.path).catch(() => {});
+    await fs.unlink(documentFile.path).catch(() => {});
+    if (thumbnailFile?.path) await fs.unlink(thumbnailFile.path).catch(() => {});
     throw httpError(400, 'Trường hoặc Khoa / Viện không hợp lệ. Vui lòng chọn từ danh sách.');
   }
 
   const slug = await uniqueSlug(title);
   const status = env.publishImmediately ? 'PUBLISHED' : 'PENDING_REVIEW';
   const now = new Date();
-  const fileFormat = mimeToFormat[req.file.mimetype] || 'OTHER';
+  const fileFormat = mimeToFormat[documentFile.mimetype] || 'OTHER';
   const metadata = parseOptionalJson(req.body.metadata, 'metadata');
-  const fileUrl = `/uploads/${path.basename(req.file.path)}`;
+  const fileUrl = `/uploads/${path.basename(documentFile.path)}`;
+  const thumbnailUrl = thumbnailFile ? `/uploads/thumbnails/${path.basename(thumbnailFile.path)}` : null;
 
   try {
     const result = await prisma.$transaction(async (transaction) => {
@@ -104,8 +112,9 @@ const createDocument = asyncHandler(async (req, res) => {
           documentType,
           fileFormat,
           fileUrl,
-          originalFileName: req.file.originalname,
-          fileSizeBytes: BigInt(req.file.size),
+          thumbnailUrl,
+          originalFileName: documentFile.originalname,
+          fileSizeBytes: BigInt(documentFile.size),
           pageCount: req.body.pageCount ? Number.parseInt(req.body.pageCount, 10) : undefined,
           academicYear: req.body.academicYear || currentAcademicYear(),
           language: req.body.language || 'vi',
@@ -126,9 +135,9 @@ const createDocument = asyncHandler(async (req, res) => {
           createdById: req.user.id,
           versionNumber: 1,
           fileUrl,
-          originalFileName: req.file.originalname,
+          originalFileName: documentFile.originalname,
           fileFormat,
-          fileSizeBytes: BigInt(req.file.size),
+          fileSizeBytes: BigInt(documentFile.size),
           pageCount: document.pageCount,
           changeNote: 'Phiên bản đầu tiên.',
         },
@@ -142,10 +151,14 @@ const createDocument = asyncHandler(async (req, res) => {
     processDocumentJob(result.job.id);
     res.status(201).json({ data: serialize({ ...result.document, processingJobId: result.job.id }) });
   } catch (error) {
-    await fs.unlink(req.file.path).catch(() => {});
+    await fs.unlink(documentFile.path).catch(() => {});
+    if (thumbnailFile?.path) {
+      await fs.unlink(thumbnailFile.path).catch(() => {});
+    }
     throw error;
   }
 });
+
 
 const listDocuments = asyncHandler(async (req, res) => {
   const page = parsePositiveInt(req.query.page, 1, 100000);
@@ -259,6 +272,7 @@ const listMyDocuments = asyncHandler(async (req, res) => {
       orderBy: { createdAt: 'desc' },
       select: {
         id: true, title: true, slug: true, documentType: true, fileFormat: true,
+        thumbnailUrl: true,
         status: true, processingStatus: true, pageCount: true, downloadCount: true,
         viewCount: true, ratingAverage: true, ratingCount: true, createdAt: true,
         publishedAt: true, rejectionReason: true,

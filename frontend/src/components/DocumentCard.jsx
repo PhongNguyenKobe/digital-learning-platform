@@ -1,12 +1,30 @@
 import { Link } from 'react-router-dom'
 
+const apiOrigin = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/api\/?$/, '')
+
 function DocumentCard({ document }) {
+  const thumbSrc = document.thumbnailUrl
+    ? (document.thumbnailUrl.startsWith('http') ? document.thumbnailUrl : `${apiOrigin}${document.thumbnailUrl}`)
+    : null
+
   return (
     <article className="document-card">
       <div className="document-cover" data-format={document.fileFormat}>
-        <span className="cover-symbol">{document.fileFormat === 'PPTX' ? '▤' : document.fileFormat === 'DOCX' ? '▥' : '▦'}</span>
+        {thumbSrc ? (
+          <img
+            alt={document.title}
+            className="document-cover-img"
+            loading="lazy"
+            src={thumbSrc}
+          />
+        ) : (
+          <span className="cover-symbol">{document.fileFormat === 'PPTX' ? '▤' : document.fileFormat === 'DOCX' ? '▥' : '▦'}</span>
+        )}
         <span className="format-badge">{document.fileFormat}</span>
-        <div className="cover-footer"><span>{document.fileFormat} • {document.pageCount || '--'} trang</span><span className="approved-mark">✓ Đã kiểm duyệt</span></div>
+        <div className="cover-footer">
+          <span>{document.fileFormat} • {document.pageCount || '--'} trang</span>
+          <span className="approved-mark">✓ Đã kiểm duyệt</span>
+        </div>
         <button className="bookmark-button" title="Lưu tài liệu" type="button">♡</button>
       </div>
       <div className="document-content">

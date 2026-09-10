@@ -1,16 +1,20 @@
 import { useState } from 'react'
-import { Navigate, Link, useNavigate } from 'react-router-dom'
+import { Navigate, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { loginUser } from '../services/api'
 
 function LoginPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const redirect = searchParams.get('redirect') || '/'
+  const isAdminLogin = redirect === '/admin'
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  if (localStorage.getItem('hls_access_token')) return <Navigate replace to="/" />
+  if (localStorage.getItem('hls_access_token')) return <Navigate replace to={redirect} />
 
   async function submit(event) {
     event.preventDefault()
@@ -26,7 +30,7 @@ function LoginPage() {
       localStorage.setItem('hls_refresh_token', response.data.refreshToken)
       if (remember) localStorage.setItem('hls_remember', 'true')
       window.dispatchEvent(new Event('hls-auth-changed'))
-      navigate('/', { replace: true })
+      navigate(redirect, { replace: true })
     } catch (requestError) {
       setError(requestError.response?.data?.error?.message || 'Email hoặc mật khẩu không chính xác.')
     } finally {
@@ -39,6 +43,16 @@ function LoginPage() {
       <div className="pointer-events-none absolute left-1/4 top-12 h-96 w-96 rounded-full bg-[#dde1ff]/40 blur-3xl" />
       <div className="pointer-events-none absolute bottom-10 right-1/4 h-80 w-80 rounded-full bg-[#d8e2ff]/30 blur-3xl" />
       <div className="relative mx-auto max-w-7xl px-4 lg:px-6">
+        {isAdminLogin && (
+          <div className="mx-auto mb-6 max-w-2xl rounded-xl border border-[#00288e]/30 bg-[#dde1ff]/80 p-4 text-center shadow-md">
+            <div className="flex items-center justify-center gap-2 font-bold text-[#00288e]">
+              <span>🛡️</span> Cổng Đăng nhập Quản trị viên (Admin Console)
+            </div>
+            <p className="mt-1 text-xs text-[#444653]">
+              Vui lòng đăng nhập bằng tài khoản có quyền Quản trị (Admin) để tiếp tục vào Bảng điều khiển.
+            </p>
+          </div>
+        )}
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full bg-[#dde1ff]/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#173bab] shadow-sm">⌂ Cổng xác thực sinh viên học viện &amp; đại học</span>
           <h1 className="mt-4 text-2xl font-bold tracking-tight text-[#00288e] md:text-3xl">Tham gia cộng đồng tri thức Học Liệu Số</h1>
