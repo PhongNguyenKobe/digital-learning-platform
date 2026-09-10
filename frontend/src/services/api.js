@@ -56,6 +56,26 @@ export async function uploadDocument(data, onUploadProgress) {
   return response.data
 }
 
+export async function updateMyDocument(id, data) {
+  const response = await api.patch(`/documents/${id}`, data)
+  return response.data
+}
+
+export async function deleteMyDocument(id) {
+  const response = await api.delete(`/documents/${id}`)
+  return response.data
+}
+
+export async function fetchMyFavorites() {
+  const response = await api.get('/documents/mine/favorites')
+  return response.data
+}
+
+export async function fetchMyDownloads() {
+  const response = await api.get('/documents/mine/downloads')
+  return response.data
+}
+
 export async function fetchUniversities(query = '') {
   const response = await api.get('/documents/catalog/universities', { params: query ? { q: query } : {} })
   return response.data

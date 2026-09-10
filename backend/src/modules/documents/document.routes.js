@@ -10,6 +10,8 @@ router.get('/catalog/universities', controller.listUniversities);
 router.get('/catalog/faculties', controller.listFaculties);
 router.get('/catalog/subjects', controller.listSubjects);
 router.get('/mine', authenticate, controller.listMyDocuments);
+router.get('/mine/favorites', authenticate, controller.listMyFavorites);
+router.get('/mine/downloads', authenticate, controller.listMyDownloads);
 router.get('/:id', controller.getDocument);
 router.post(
   '/',
@@ -17,5 +19,7 @@ router.post(
   uploadDocument,
   controller.createDocument,
 );
+router.patch('/:id', authenticate, controller.updateMyDocument);
+router.delete('/:id', authenticate, controller.deleteMyDocument);
 
 module.exports = router;

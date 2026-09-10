@@ -285,4 +285,183 @@ const listMyDocuments = asyncHandler(async (req, res) => {
   res.json({ data: serialize(documents), meta: { page, limit, total, totalPages: Math.ceil(total / limit) } });
 });
 
-module.exports = { createDocument, listDocuments, getDocument, listMyDocuments, listUniversities, listFaculties, listSubjects };
+const updateMyDocument = asyncHandler(async (req, res) => {
+  const document = await prisma.document.findFirst({
+    where: { id: req.params.id, deletedAt: null },
+  });
+  if (!document) throw httpError(404, 'Không tìm thấy tài liệu.');
+  if (document.uploaderId !== req.user.id && req.user.role !== 'ADMIN') {
+    throw httpError(403, 'Bạn không có quyền chỉnh sửa tài liệu này.');
+  }
+
+  const {
+    title,
+    description,
+    universityId,
+    facultyId,
+    subjectId,
+    documentType,
+    visibility,
+    academicYear,
+    categoryId,
+  } = req.body;
+
+  const data = {};
+  if (title !== undefined) {
+    const trimmed = String(title).trim();
+    if (!trimmed) throw httpError(400, 'Tiêu đề không được để trống.');
+    data.title = trimmed;
+    if (trimmed !== document.title) {
+      data.slug = await uniqueSlug(trimmed);
+    }
+  }
+  if (description !== undefined) data.description = String(description).trim();
+  if (academicYear !== undefined) data.academicYear = String(academicYear).trim();
+  if (documentType !== undefined) {
+    if (validDocumentTypes.has(documentType)) data.documentType = documentType;
+  }
+  if (visibility !== undefined) {
+    if (['PUBLIC', 'UNLISTED', 'PRIVATE'].includes(visibility)) data.visibility = visibility;
+  }
+  if (universityId !== undefined) data.universityId = universityId || null;
+  if (facultyId !== undefined) data.facultyId = facultyId || null;
+  if (subjectId !== undefined) data.subjectId = subjectId || null;
+
+  const updated = await prisma.document.update({
+    where: { id: req.params.id },
+    data,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      description: true,
+      documentType: true,
+      fileFormat: true,
+      thumbnailUrl: true,
+      status: true,
+      processingStatus: true,
+      visibility: true,
+      academicYear: true,
+      pageCount: true,
+      downloadCount: true,
+      viewCount: true,
+      ratingAverage: true,
+      ratingCount: true,
+      createdAt: true,
+      updatedAt: true,
+      university: { select: { id: true, shortName: true, name: true } },
+      faculty: { select: { id: true, name: true } },
+      subject: { select: { id: true, code: true, name: true } },
+    },
+  });
+
+  if (categoryId !== undefined) {
+    await prisma.documentCategory.deleteMany({ where: { documentId: req.params.id } });
+    if (categoryId) {
+      await prisma.documentCategory.create({ data: { documentId: req.params.id, categoryId } });
+    }
+  }
+
+  res.json({ data: serialize(updated), message: 'Cập nhật tài liệu thành công.' });
+});
+
+const deleteMyDocument = asyncHandler(async (req, res) => {
+  const document = await prisma.document.findFirst({
+    where: { id: req.params.id, deletedAt: null },
+  });
+  if (!document) throw httpError(404, 'Không tìm thấy tài liệu.');
+  if (document.uploaderId !== req.user.id && req.user.role !== 'ADMIN') {
+    throw httpError(403, 'Bạn không có quyền xóa tài liệu này.');
+  }
+
+  await prisma.document.update({
+    where: { id: req.params.id },
+    data: { deletedAt: new Date(), status: 'ARCHIVED' },
+  });
+
+  res.json({ message: 'Đã xóa tài liệu thành công.' });
+});
+
+const listMyFavorites = asyncHandler(async (req, res) => {
+  const favorites = await prisma.favorite.findMany({
+    where: { userId: req.user.id, document: { deletedAt: null } },
+    orderBy: { createdAt: 'desc' },
+    include: {
+      document: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          documentType: true,
+          fileFormat: true,
+          thumbnailUrl: true,
+          status: true,
+          pageCount: true,
+          downloadCount: true,
+          viewCount: true,
+          ratingAverage: true,
+          ratingCount: true,
+          createdAt: true,
+          uploader: { select: { id: true, fullName: true, username: true, avatarUrl: true } },
+          university: { select: { id: true, shortName: true, name: true } },
+          subject: { select: { id: true, code: true, name: true } },
+        },
+      },
+    },
+  });
+  const data = favorites.map((f) => ({
+    ...f.document,
+    favoritedAt: f.createdAt,
+  }));
+  res.json({ data: serialize(data) });
+});
+
+const listMyDownloads = asyncHandler(async (req, res) => {
+  const downloads = await prisma.download.findMany({
+    where: { userId: req.user.id, document: { deletedAt: null } },
+    orderBy: { createdAt: 'desc' },
+    distinct: ['documentId'],
+    take: 50,
+    include: {
+      document: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          documentType: true,
+          fileFormat: true,
+          thumbnailUrl: true,
+          status: true,
+          pageCount: true,
+          downloadCount: true,
+          viewCount: true,
+          ratingAverage: true,
+          ratingCount: true,
+          createdAt: true,
+          uploader: { select: { id: true, fullName: true, username: true, avatarUrl: true } },
+          university: { select: { id: true, shortName: true, name: true } },
+          subject: { select: { id: true, code: true, name: true } },
+        },
+      },
+    },
+  });
+  const data = downloads.map((d) => ({
+    ...d.document,
+    downloadedAt: d.createdAt,
+  }));
+  res.json({ data: serialize(data) });
+});
+
+module.exports = {
+  createDocument,
+  listDocuments,
+  getDocument,
+  listMyDocuments,
+  updateMyDocument,
+  deleteMyDocument,
+  listMyFavorites,
+  listMyDownloads,
+  listUniversities,
+  listFaculties,
+  listSubjects,
+};
