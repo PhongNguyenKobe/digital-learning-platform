@@ -4,7 +4,7 @@ const httpError = require('../../utils/httpError');
 
 const documentStatuses = new Set(['PUBLISHED', 'REJECTED', 'ARCHIVED', 'PENDING_REVIEW']);
 const reportStatuses = new Set(['OPEN', 'IN_REVIEW', 'RESOLVED', 'DISMISSED']);
-const userRoles = new Set(['STUDENT', 'CONTRIBUTOR', 'MODERATOR', 'ADMIN']);
+const userRoles = new Set(['STUDENT', 'ADMIN']);
 const userStatuses = new Set(['ACTIVE', 'SUSPENDED', 'DELETED']);
 const commentStatuses = new Set(['VISIBLE', 'HIDDEN', 'DELETED']);
 
@@ -103,6 +103,20 @@ const updateDocumentStatus = asyncHandler(async (req, res) => {
   res.json({ data: serialize(updated) });
 });
 
+const softDeleteDocument = asyncHandler(async (req, res) => {
+  const document = await prisma.document.findFirst({ where: { id: req.params.id, deletedAt: null }, select: { id: true } });
+  if (!document) throw httpError(404, 'Không tìm thấy tài liệu đang hoạt động.');
+  await prisma.document.update({ where: { id: document.id }, data: { deletedAt: new Date(), status: 'ARCHIVED', visibility: 'PRIVATE' } });
+  res.json({ data: { id: document.id, message: 'Đã chuyển tài liệu vào thùng rác trong 30 ngày.' } });
+});
+
+const restoreDocument = asyncHandler(async (req, res) => {
+  const document = await prisma.document.findFirst({ where: { id: req.params.id, deletedAt: { not: null } }, select: { id: true } });
+  if (!document) throw httpError(404, 'Không tìm thấy tài liệu trong thùng rác.');
+  await prisma.document.update({ where: { id: document.id }, data: { deletedAt: null, status: 'PENDING_REVIEW', visibility: 'PUBLIC' } });
+  res.json({ data: { id: document.id, message: 'Đã khôi phục tài liệu và đưa vào hàng chờ duyệt.' } });
+});
+
 const updateReport = asyncHandler(async (req, res) => {
   const status = String(req.body.status || '').toUpperCase();
   if (!reportStatuses.has(status)) throw httpError(400, 'status report không hợp lệ.');
@@ -198,6 +212,8 @@ module.exports = {
   listReports,
   listFlaggedDocuments,
   updateDocumentStatus,
+  softDeleteDocument,
+  restoreDocument,
   updateReport,
   updateCommentStatus,
   listUsers,

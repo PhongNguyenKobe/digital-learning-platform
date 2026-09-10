@@ -6,7 +6,7 @@ const documentTypes = [
   ['THESIS', 'Đồ án / luận văn'],
 ]
 
-const trendingSearches = ['Kinh tế vi mô', 'Giải tích 1 Bách Khoa', 'Lập trình Python ĐHQG', 'Luật dân sự NEU', 'Dược lý học lâm sàng']
+const trendingSearches = ['Cơ sở dữ liệu HUST', 'Lập trình hướng đối tượng UIT', 'Thiết kế kiến trúc UAH', 'Marketing UEH', 'Lập trình căn bản Cần Thơ']
 
 function SearchHero({ documentType, onDocumentTypeChange, onQueryChange, onSubmit, query, onTrendingSearch }) {
   return (
@@ -14,8 +14,8 @@ function SearchHero({ documentType, onDocumentTypeChange, onQueryChange, onSubmi
       <div className="hero-decor hero-decor-top" />
       <div className="hero-decor hero-decor-bottom" />
       <div className="hero-copy">
-        <span className="eyebrow"><span className="status-dot">✓</span> Hệ sinh thái tri thức sinh viên đại học số 1 Việt Nam <i /> <small>Niên khóa 2024 - 2025</small></span>
-        <h1>Hơn <strong>500,000+</strong> tài liệu học tập, đề thi &amp; bài giảng chất lượng cao từ <em>80+ trường đại học</em></h1>
+        <span className="eyebrow"><span className="status-dot">✓</span> Hệ sinh thái tri thức sinh viên đại học <i /> <small>Danh mục 2026</small></span>
+        <h1>Khám phá học liệu, đề thi &amp; bài giảng từ <em>15+ trường đại học trong danh mục</em></h1>
         <p>Cộng đồng học thuật mở giúp sinh viên đạt điểm A+, hoàn thành đồ án xuất sắc và nâng cao năng lực nghiên cứu khoa học chuyên sâu.</p>
       </div>
       <form className="hero-search" onSubmit={onSubmit}>
@@ -33,10 +33,10 @@ function SearchHero({ documentType, onDocumentTypeChange, onQueryChange, onSubmi
       </form>
       <div className="trending-searches"><span className="trending-label">♨ Xu hướng:</span>{trendingSearches.map((item) => <button key={item} onClick={() => onTrendingSearch(item)} type="button">{item}</button>)}</div>
       <div className="hero-stats">
-        <div><span className="stat-icon">⌂</span><span><strong>80+</strong><small>Trường Đại Học</small></span></div>
-        <div><span className="stat-icon green">✓</span><span><strong>520k+</strong><small>Tài Liệu Xác Thực</small></span></div>
-        <div><span className="stat-icon blue">♧</span><span><strong>1.2M+</strong><small>Sinh Viên Tin Dùng</small></span></div>
-        <div><span className="stat-icon">◉</span><span><strong>100%</strong><small>Đọc Trước Miễn Phí</small></span></div>
+        <div><span className="stat-icon">⌂</span><span><strong>15+</strong><small>Trường trong danh mục</small></span></div>
+        <div><span className="stat-icon green">✓</span><span><strong>17+</strong><small>Khoa / Viện phụ trách</small></span></div>
+        <div><span className="stat-icon blue">♧</span><span><strong>20+</strong><small>Mã học phần mẫu</small></span></div>
+        <div><span className="stat-icon">◉</span><span><strong>2026</strong><small>Danh mục cập nhật</small></span></div>
       </div>
     </section>
   )

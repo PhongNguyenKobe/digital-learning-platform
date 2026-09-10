@@ -7,7 +7,7 @@ function AdminDashboardPage() {
   const [notice, setNotice] = useState('')
 
   async function load() {
-    try { const [reportResponse, userResponse] = await Promise.all([fetchAdminReports({ limit: 50 }), fetchAdminUsers({ limit: 8 })]); setReports(reportResponse.data || []); setUsers(userResponse.data || []) } catch (error) { setNotice(error.response?.data?.error?.message || 'Bạn cần đăng nhập bằng tài khoản Moderator/Admin.') }
+    try { const [reportResponse, userResponse] = await Promise.all([fetchAdminReports({ limit: 50 }), fetchAdminUsers({ limit: 8 })]); setReports(reportResponse.data || []); setUsers(userResponse.data || []) } catch (error) { setNotice(error.response?.data?.error?.message || 'Bạn cần đăng nhập bằng tài khoản Admin.') }
   }
   useEffect(() => {
     let cancelled = false
@@ -16,7 +16,7 @@ function AdminDashboardPage() {
         const [reportResponse, userResponse] = await Promise.all([fetchAdminReports({ limit: 50 }), fetchAdminUsers({ limit: 8 })])
         if (!cancelled) { setReports(reportResponse.data || []); setUsers(userResponse.data || []) }
       } catch (error) {
-        if (!cancelled) setNotice(error.response?.data?.error?.message || 'Bạn cần đăng nhập bằng tài khoản Moderator/Admin.')
+        if (!cancelled) setNotice(error.response?.data?.error?.message || 'Bạn cần đăng nhập bằng tài khoản Admin.')
       }
     }
     initialLoad()

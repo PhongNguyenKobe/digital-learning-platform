@@ -6,7 +6,7 @@ import Pagination from '../components/Pagination'
 import SearchHero from '../components/SearchHero'
 import { fetchDocuments } from '../services/api'
 
-const initialFilters = { documentType: '', sortBy: 'createdAt' }
+const initialFilters = { documentType: '', universityId: '', universityName: '', facultyId: '', facultyName: '', sortBy: 'createdAt' }
 
 function HomePage() {
   const [query, setQuery] = useState('')
@@ -28,6 +28,8 @@ function HomePage() {
           limit: 6,
           q: submittedQuery || undefined,
           documentType: filters.documentType || undefined,
+          universityId: filters.universityId || undefined,
+          facultyId: filters.facultyId || undefined,
           sortBy: filters.sortBy,
           sortOrder: 'desc',
         })
@@ -50,7 +52,7 @@ function HomePage() {
 
   function changeFilter(name, value) {
     setPage(1)
-    setFilters((current) => ({ ...current, [name]: value }))
+    setFilters((current) => ({ ...current, [name]: value, ...(name === 'universityId' ? { facultyId: '', facultyName: '', ...(value ? {} : { universityName: '' }) } : {}), ...(name === 'facultyId' && !value ? { facultyName: '' } : {}) }))
   }
 
   function resetFilters() {
@@ -73,7 +75,7 @@ function HomePage() {
         <div className="catalog-layout">
           <DocumentFilters filters={filters} onChange={changeFilter} onReset={resetFilters} />
           <div className="results-column">
-            <div className="results-toolbar"><div className="active-pills"><span>Đang lọc:</span>{submittedQuery && <button type="button" onClick={() => { setQuery(''); setSubmittedQuery(''); }}>⌕ {submittedQuery} ×</button>}{filters.documentType && <button type="button" onClick={() => changeFilter('documentType', '')}>{filters.documentType} ×</button>}<button className="clear-pills" type="button" onClick={resetFilters}>Xóa tất cả</button></div><span className="result-count">{result.meta.total || 0} tài liệu</span></div>
+            <div className="results-toolbar"><div className="active-pills"><span>Đang lọc:</span>{submittedQuery && <button type="button" onClick={() => { setQuery(''); setSubmittedQuery(''); }}>⌕ {submittedQuery} ×</button>}{filters.universityName && <button type="button" onClick={() => changeFilter('universityId', '')}>{filters.universityName} ×</button>}{filters.facultyName && <button type="button" onClick={() => changeFilter('facultyId', '')}>{filters.facultyName} ×</button>}{filters.documentType && <button type="button" onClick={() => changeFilter('documentType', '')}>{filters.documentType} ×</button>}<button className="clear-pills" type="button" onClick={resetFilters}>Xóa tất cả</button></div><span className="result-count">{result.meta.total || 0} tài liệu</span></div>
             {loading && <div className="state-panel"><span className="loading-orb" /> Đang tìm học liệu phù hợp...</div>}
             {!loading && error && <div className="state-panel error-state">{error}</div>}
             {!loading && !error && result.data.length === 0 && <div className="state-panel">Chưa tìm thấy tài liệu phù hợp. Thử một từ khóa khác nhé.</div>}
@@ -83,7 +85,7 @@ function HomePage() {
         </div>
       </section>
       <section className="mx-auto mb-16 mt-2 max-w-5xl overflow-hidden rounded-xl bg-linear-to-r from-[#00288e] via-[#1e40af] to-[#0058be] px-6 py-8 text-white shadow-lg lg:px-10">
-        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center"><div><span className="text-xs font-semibold uppercase tracking-[.14em] text-[#b8c4ff]">Chia sẻ để nhận đặc quyền</span><h2 className="mt-2 text-2xl font-bold tracking-tight">Tải lên tài liệu, mở khóa kho tri thức.</h2><p className="mt-2 max-w-xl text-sm leading-6 text-[#d8e2ff]">Đóng góp giáo trình, đề thi hoặc bài giảng của bạn để nhận điểm uy tín và giúp hàng nghìn sinh viên học tốt hơn.</p></div><Link className="shrink-0 rounded-lg bg-white px-5 py-3 text-sm font-bold text-[#00288e] shadow-md transition hover:bg-[#d8e2ff]" to={localStorage.getItem('hls_access_token') ? '/dong-gop' : '/dang-nhap'}>☁ Đăng tải ngay →</Link></div>
+        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center"><div><span className="text-xs font-semibold uppercase tracking-[.14em] text-[#b8c4ff]">Chia sẻ để nhận đặc quyền</span><h2 className="mt-2 text-2xl font-bold tracking-tight">Tải lên tài liệu, mở khóa kho tri thức.</h2><p className="mt-2 max-w-xl text-sm leading-6 text-[#d8e2ff]">Đóng góp giáo trình, đề thi hoặc bài giảng của bạn để nhận điểm uy tín và giúp hàng nghìn sinh viên học tốt hơn.</p></div><Link className="shrink-0 rounded-lg bg-[#f8fbff] px-5 py-3 text-sm font-bold !text-[#00288e] shadow-md ring-1 ring-white/60 transition hover:bg-[#d8e2ff] hover:!text-[#001453] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" to={localStorage.getItem('hls_access_token') ? '/dong-gop' : '/dang-nhap'}>☁ Đăng tải ngay →</Link></div>
       </section>
     </>
   )

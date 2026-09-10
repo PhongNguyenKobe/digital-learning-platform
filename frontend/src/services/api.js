@@ -26,6 +26,16 @@ export async function registerUser(data) {
   return response.data
 }
 
+export async function fetchCurrentUser() {
+  const response = await api.get('/auth/me')
+  return response.data
+}
+
+export async function changePassword(data) {
+  const response = await api.patch('/auth/password', data)
+  return response.data
+}
+
 export async function fetchDocument(id) {
   const response = await api.get(`/documents/${id}`)
   return response.data
@@ -91,6 +101,16 @@ export async function updateAdminReport(id, data) {
 
 export async function updateDocumentStatus(id, data) {
   const response = await api.patch(`/admin/documents/${id}/status`, data)
+  return response.data
+}
+
+export async function deleteAdminDocument(id) {
+  const response = await api.delete(`/admin/documents/${id}`)
+  return response.data
+}
+
+export async function restoreAdminDocument(id) {
+  const response = await api.post(`/admin/documents/${id}/restore`)
   return response.data
 }
 

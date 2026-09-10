@@ -22,6 +22,8 @@ const publicUserSelect = {
   status: true,
   universityId: true,
   facultyId: true,
+  university: { select: { name: true, shortName: true } },
+  faculty: { select: { name: true } },
 };
 
 function normalizeEmail(email) {
@@ -151,4 +153,27 @@ const me = asyncHandler(async (req, res) => {
   res.json({ data: user });
 });
 
-module.exports = { register, login, refresh, logout, me };
+const changePassword = asyncHandler(async (req, res) => {
+  const currentPassword = req.body.currentPassword;
+  const newPassword = req.body.newPassword;
+  validatePassword(newPassword);
+  if (!currentPassword || typeof currentPassword !== 'string') {
+    throw httpError(400, 'Vui lòng nhập mật khẩu hiện tại.');
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: req.user.id }, select: { passwordHash: true } });
+  if (!user || !(await bcrypt.compare(currentPassword, user.passwordHash))) {
+    throw httpError(401, 'Mật khẩu hiện tại không chính xác.');
+  }
+  if (currentPassword === newPassword) {
+    throw httpError(400, 'Mật khẩu mới cần khác mật khẩu hiện tại.');
+  }
+
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: req.user.id }, data: { passwordHash: await bcrypt.hash(newPassword, 12) } }),
+    prisma.refreshToken.updateMany({ where: { userId: req.user.id, revokedAt: null }, data: { revokedAt: new Date() } }),
+  ]);
+  res.json({ data: { message: 'Đổi mật khẩu thành công. Vui lòng đăng nhập lại trên các thiết bị khác.' } });
+});
+
+module.exports = { register, login, refresh, logout, me, changePassword };

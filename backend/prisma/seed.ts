@@ -66,18 +66,42 @@ async function main() {
         website: 'https://uet.vnu.edu.vn',
       },
     }),
+    prisma.university.create({ data: { code: 'HCMUE', name: 'Trường Đại học Sư phạm Thành phố Hồ Chí Minh', shortName: 'HCMUE', website: 'https://hcmue.edu.vn' } }),
+    prisma.university.create({ data: { code: 'UAH', name: 'Trường Đại học Kiến trúc Thành phố Hồ Chí Minh', shortName: 'UAH', website: 'https://uah.edu.vn' } }),
+    prisma.university.create({ data: { code: 'VNU-HN', name: 'Đại học Quốc gia Hà Nội', shortName: 'VNU-HN', website: 'https://vnu.edu.vn' } }),
+    prisma.university.create({ data: { code: 'VNU-HCM', name: 'Đại học Quốc gia Thành phố Hồ Chí Minh', shortName: 'VNU-HCM', website: 'https://vnuhcm.edu.vn' } }),
+    prisma.university.create({ data: { code: 'UEH', name: 'Đại học Kinh tế Thành phố Hồ Chí Minh', shortName: 'UEH', website: 'https://ueh.edu.vn' } }),
+    prisma.university.create({ data: { code: 'TDTU', name: 'Trường Đại học Tôn Đức Thắng', shortName: 'TDTU', website: 'https://tdtu.edu.vn' } }),
+    prisma.university.create({ data: { code: 'DTU', name: 'Đại học Duy Tân', shortName: 'DTU', website: 'https://duytan.edu.vn' } }),
+    prisma.university.create({ data: { code: 'USTH', name: 'Trường Đại học Khoa học và Công nghệ Hà Nội', shortName: 'USTH', website: 'https://usth.edu.vn' } }),
+    prisma.university.create({ data: { code: 'CTU', name: 'Đại học Cần Thơ', shortName: 'CTU', website: 'https://ctu.edu.vn' } }),
+    prisma.university.create({ data: { code: 'TMU', name: 'Trường Đại học Thương mại', shortName: 'TMU', website: 'https://tmu.edu.vn' } }),
+    prisma.university.create({ data: { code: 'HUE', name: 'Đại học Huế', shortName: 'HUE', website: 'https://hueuni.edu.vn' } }),
+    prisma.university.create({ data: { code: 'NTTU', name: 'Trường Đại học Nguyễn Tất Thành', shortName: 'NTTU', website: 'https://ntt.edu.vn' } }),
   ]);
 
-  const [hust, neu, uet] = universities;
+  const [hust, neu, uet, hcmue, uah, vnuHn, vnuHcm, ueh, tdtu, dtu, usth, ctu, tmu, hue, nttu] = universities;
   const faculties = await Promise.all([
     prisma.faculty.create({ data: { universityId: hust.id, code: 'SOICT', name: 'Công nghệ thông tin' } }),
     prisma.faculty.create({ data: { universityId: hust.id, code: 'SEEE', name: 'Điện - Điện tử' } }),
     prisma.faculty.create({ data: { universityId: neu.id, code: 'TKT', name: 'Toán kinh tế' } }),
     prisma.faculty.create({ data: { universityId: neu.id, code: 'QTKD', name: 'Quản trị kinh doanh' } }),
     prisma.faculty.create({ data: { universityId: uet.id, code: 'FIT', name: 'Công nghệ thông tin' } }),
+    prisma.faculty.create({ data: { universityId: hcmue.id, code: 'FIT', name: 'Khoa Công nghệ thông tin' } }),
+    prisma.faculty.create({ data: { universityId: uah.id, code: 'ARCH', name: 'Khoa Kiến trúc' } }),
+    prisma.faculty.create({ data: { universityId: vnuHn.id, code: 'USSH', name: 'Trường Đại học Khoa học Xã hội và Nhân văn' } }),
+    prisma.faculty.create({ data: { universityId: vnuHcm.id, code: 'UIT', name: 'Trường Đại học Công nghệ Thông tin' } }),
+    prisma.faculty.create({ data: { universityId: ueh.id, code: 'ISB', name: 'Viện Đào tạo quốc tế' } }),
+    prisma.faculty.create({ data: { universityId: tdtu.id, code: 'FCS', name: 'Khoa Khoa học máy tính' } }),
+    prisma.faculty.create({ data: { universityId: dtu.id, code: 'SCE', name: 'Trường Công nghệ và Kỹ thuật' } }),
+    prisma.faculty.create({ data: { universityId: usth.id, code: 'ICT', name: 'Khoa Công nghệ thông tin và Truyền thông' } }),
+    prisma.faculty.create({ data: { universityId: ctu.id, code: 'CIT', name: 'Khoa Công nghệ thông tin và Truyền thông' } }),
+    prisma.faculty.create({ data: { universityId: tmu.id, code: 'FE', name: 'Khoa Kinh tế' } }),
+    prisma.faculty.create({ data: { universityId: hue.id, code: 'KHTN', name: 'Trường Đại học Khoa học' } }),
+    prisma.faculty.create({ data: { universityId: nttu.id, code: 'IT', name: 'Khoa Công nghệ thông tin' } }),
   ]);
 
-  const [soict, seee, tkt, qtkd, fit] = faculties;
+  const [soict, seee, tkt, qtkd, fit, hcmueFit, uahArch, vnuHnUssh, vnuHcmUit, uehIsb, tdtuFcs, dtuSce, usthIct, ctuCit, tmuFe, hueKhtn, nttuIt] = faculties;
   const subjects = await Promise.all([
     prisma.subject.create({ data: { facultyId: soict.id, code: 'IT3080', name: 'Cơ sở dữ liệu', credits: 3, description: 'Mô hình dữ liệu, SQL và thiết kế cơ sở dữ liệu.' } }),
     prisma.subject.create({ data: { facultyId: soict.id, code: 'IT4062', name: 'Công nghệ phần mềm', credits: 3, description: 'Quy trình và kỹ thuật phát triển phần mềm.' } }),
@@ -87,14 +111,26 @@ async function main() {
     prisma.subject.create({ data: { facultyId: fit.id, code: 'INT2204', name: 'Lập trình Python', credits: 3 } }),
     prisma.subject.create({ data: { facultyId: fit.id, code: 'INT3306', name: 'Trí tuệ nhân tạo', credits: 3 } }),
     prisma.subject.create({ data: { facultyId: fit.id, code: 'INT3401', name: 'Phát triển ứng dụng web', credits: 3 } }),
+    prisma.subject.create({ data: { facultyId: hcmueFit.id, code: 'CTDLGT', name: 'Cấu trúc dữ liệu và giải thuật', credits: 3 } }),
+    prisma.subject.create({ data: { facultyId: uahArch.id, code: 'KTA201', name: 'Thiết kế kiến trúc 1', credits: 4 } }),
+    prisma.subject.create({ data: { facultyId: vnuHnUssh.id, code: 'XHH101', name: 'Nhập môn Xã hội học', credits: 3 } }),
+    prisma.subject.create({ data: { facultyId: vnuHcmUit.id, code: 'CS114', name: 'Lập trình hướng đối tượng', credits: 4 } }),
+    prisma.subject.create({ data: { facultyId: uehIsb.id, code: 'MKT201', name: 'Nguyên lý Marketing', credits: 3 } }),
+    prisma.subject.create({ data: { facultyId: tdtuFcs.id, code: 'CSC101', name: 'Nhập môn lập trình', credits: 3 } }),
+    prisma.subject.create({ data: { facultyId: dtuSce.id, code: 'CSE301', name: 'Kỹ nghệ phần mềm', credits: 3 } }),
+    prisma.subject.create({ data: { facultyId: usthIct.id, code: 'ICT201', name: 'Cơ sở dữ liệu', credits: 3 } }),
+    prisma.subject.create({ data: { facultyId: ctuCit.id, code: 'CT101', name: 'Lập trình căn bản', credits: 3 } }),
+    prisma.subject.create({ data: { facultyId: tmuFe.id, code: 'KTCT101', name: 'Kinh tế chính trị Mác - Lênin', credits: 2 } }),
+    prisma.subject.create({ data: { facultyId: hueKhtn.id, code: 'TIN101', name: 'Nhập môn Tin học', credits: 3 } }),
+    prisma.subject.create({ data: { facultyId: nttuIt.id, code: 'CSC102', name: 'Lập trình C++', credits: 3 } }),
   ]);
 
   const users = await Promise.all([
     prisma.user.create({ data: { email: 'admin@digital-learning.test', username: 'admin', fullName: 'Nguyễn Minh Quân', passwordHash: seedPasswordHash, role: 'ADMIN', emailVerifiedAt: daysAgo(120) } }),
-    prisma.user.create({ data: { email: 'moderator@digital-learning.test', username: 'moderator', fullName: 'Trần Thu Hà', passwordHash: seedPasswordHash, role: 'MODERATOR', universityId: neu.id, facultyId: tkt.id, emailVerifiedAt: daysAgo(110) } }),
-    prisma.user.create({ data: { email: 'an.nguyen@hust.edu.vn', username: 'annguyen', fullName: 'Nguyễn Hoàng An', passwordHash: seedPasswordHash, role: 'CONTRIBUTOR', universityId: hust.id, facultyId: soict.id, bio: 'Sinh viên K66 ngành Công nghệ thông tin.', emailVerifiedAt: daysAgo(90) } }),
-    prisma.user.create({ data: { email: 'linh.tran@neu.edu.vn', username: 'linhtran', fullName: 'Trần Ngọc Linh', passwordHash: seedPasswordHash, role: 'CONTRIBUTOR', universityId: neu.id, facultyId: tkt.id, emailVerifiedAt: daysAgo(80) } }),
-    prisma.user.create({ data: { email: 'bao.le@uet.vnu.edu.vn', username: 'lebao', fullName: 'Lê Quốc Bảo', passwordHash: seedPasswordHash, role: 'CONTRIBUTOR', universityId: uet.id, facultyId: fit.id, emailVerifiedAt: daysAgo(70) } }),
+    prisma.user.create({ data: { email: 'moderator@digital-learning.test', username: 'moderator', fullName: 'Trần Thu Hà', passwordHash: seedPasswordHash, role: 'STUDENT', universityId: neu.id, facultyId: tkt.id, emailVerifiedAt: daysAgo(110) } }),
+    prisma.user.create({ data: { email: 'an.nguyen@hust.edu.vn', username: 'annguyen', fullName: 'Nguyễn Hoàng An', passwordHash: seedPasswordHash, role: 'STUDENT', universityId: hust.id, facultyId: soict.id, bio: 'Sinh viên K66 ngành Công nghệ thông tin.', emailVerifiedAt: daysAgo(90) } }),
+    prisma.user.create({ data: { email: 'linh.tran@neu.edu.vn', username: 'linhtran', fullName: 'Trần Ngọc Linh', passwordHash: seedPasswordHash, role: 'STUDENT', universityId: neu.id, facultyId: tkt.id, emailVerifiedAt: daysAgo(80) } }),
+    prisma.user.create({ data: { email: 'bao.le@uet.vnu.edu.vn', username: 'lebao', fullName: 'Lê Quốc Bảo', passwordHash: seedPasswordHash, role: 'STUDENT', universityId: uet.id, facultyId: fit.id, emailVerifiedAt: daysAgo(70) } }),
     prisma.user.create({ data: { email: 'mai.pham@student.test', username: 'maipham', fullName: 'Phạm Thùy Mai', passwordHash: seedPasswordHash, universityId: hust.id, facultyId: soict.id, emailVerifiedAt: daysAgo(60) } }),
     prisma.user.create({ data: { email: 'duc.ho@student.test', username: 'duc.ho', fullName: 'Hồ Minh Đức', passwordHash: seedPasswordHash, universityId: neu.id, facultyId: qtkd.id, emailVerifiedAt: daysAgo(50) } }),
     prisma.user.create({ data: { email: 'yen.vo@student.test', username: 'yenvo', fullName: 'Võ Khánh Yến', passwordHash: seedPasswordHash, universityId: uet.id, facultyId: fit.id, emailVerifiedAt: daysAgo(40) } }),

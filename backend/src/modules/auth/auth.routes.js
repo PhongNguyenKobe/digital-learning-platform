@@ -9,5 +9,6 @@ router.post('/login', controller.login);
 router.post('/refresh', controller.refresh);
 router.post('/logout', authenticate, controller.logout);
 router.get('/me', authenticate, controller.me);
+router.patch('/password', authenticate, controller.changePassword);
 
 module.exports = router;
