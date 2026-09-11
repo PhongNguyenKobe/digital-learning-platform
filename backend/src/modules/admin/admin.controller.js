@@ -176,6 +176,7 @@ const updateDocumentDetails = asyncHandler(async (req, res) => {
         ...(facultyId !== undefined ? { facultyId: facultyId || null } : {}),
         ...(subjectId !== undefined ? { subjectId: subjectId || null } : {}),
         ...(visibility ? { visibility: String(visibility).toUpperCase() } : {}),
+        ...(req.body.isLocked !== undefined ? { isLocked: Boolean(req.body.isLocked) } : {}),
         ...(isVerified !== undefined ? { isVerified: Boolean(isVerified) } : {}),
         ...(status && documentStatuses.has(status.toUpperCase()) ? { status: status.toUpperCase() } : {}),
       },
@@ -299,6 +300,7 @@ const listUsers = asyncHandler(async (req, res) => {
       orderBy: { createdAt: 'desc' },
       select: {
         id: true, email: true, username: true, fullName: true, avatarUrl: true, role: true, status: true,
+        downloadCredits: true, isPremium: true, premiumExpiresAt: true,
         createdAt: true, lastLoginAt: true, university: { select: { id: true, name: true, shortName: true } }, faculty: { select: { id: true, name: true } },
         _count: { select: { uploadedDocuments: true, comments: true, reports: true } },
       },
@@ -336,6 +338,7 @@ const createUser = asyncHandler(async (req, res) => {
     },
     select: {
       id: true, email: true, fullName: true, username: true, role: true, status: true,
+      downloadCredits: true, isPremium: true, premiumExpiresAt: true,
       university: { select: { id: true, name: true } },
       createdAt: true,
     },
@@ -349,7 +352,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
   const user = await prisma.user.findUnique({ where: { id: req.params.id } });
   if (!user) throw httpError(404, 'Không tìm thấy người dùng.');
 
-  const { fullName, email, role, status, universityId, facultyId } = req.body;
+  const { fullName, email, role, status, universityId, facultyId, downloadCredits, isPremium } = req.body;
   if (role && !userRoles.has(role.toUpperCase())) throw httpError(400, 'Role không hợp lệ.');
   if (status && !userStatuses.has(status.toUpperCase())) throw httpError(400, 'Status không hợp lệ.');
 
@@ -363,8 +366,10 @@ const updateUserDetails = asyncHandler(async (req, res) => {
         ...(status ? { status: status.toUpperCase(), deletedAt: status === 'DELETED' ? new Date() : null } : {}),
         ...(universityId !== undefined ? { universityId: universityId || null } : {}),
         ...(facultyId !== undefined ? { facultyId: facultyId || null } : {}),
+        ...(downloadCredits !== undefined ? { downloadCredits: Math.max(0, Number.parseInt(downloadCredits, 10) || 0) } : {}),
+        ...(isPremium !== undefined ? { isPremium: Boolean(isPremium) } : {}),
       },
-      select: { id: true, email: true, fullName: true, role: true, status: true, universityId: true, facultyId: true },
+      select: { id: true, email: true, fullName: true, role: true, status: true, universityId: true, facultyId: true, downloadCredits: true, isPremium: true },
     });
     if (status && status !== 'ACTIVE') {
       await tx.refreshToken.updateMany({ where: { userId: user.id, revokedAt: null }, data: { revokedAt: new Date() } });

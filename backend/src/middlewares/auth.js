@@ -34,6 +34,29 @@ async function authenticate(req, res, next) {
   }
 }
 
+async function optionalAuthenticate(req, res, next) {
+  try {
+    const authorization = req.headers.authorization;
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+      return next();
+    }
+    const token = authorization.slice(7);
+    const payload = jwt.verify(token, env.jwtAccessSecret);
+    if (payload.type === 'access') {
+      const user = await prisma.user.findUnique({
+        where: { id: payload.sub },
+        select: { id: true, email: true, username: true, fullName: true, role: true, status: true, downloadCredits: true, isPremium: true, premiumExpiresAt: true },
+      });
+      if (user && user.status === 'ACTIVE') {
+        req.user = user;
+      }
+    }
+  } catch (error) {
+    // Không ném lỗi đối với optional auth
+  }
+  next();
+}
+
 function requireRoles(...roles) {
   return function roleMiddleware(req, res, next) {
     if (!req.user || !roles.includes(req.user.role)) {
@@ -43,4 +66,4 @@ function requireRoles(...roles) {
   };
 }
 
-module.exports = { authenticate, requireRoles };
+module.exports = { authenticate, optionalAuthenticate, requireRoles };

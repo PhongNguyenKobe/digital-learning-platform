@@ -10,6 +10,7 @@ export default function EditMyDocumentModal({ doc, onClose, onSave }) {
   const [universityId, setUniversityId] = useState(doc.university?.id || doc.universityId || '')
   const [facultyId, setFacultyId] = useState(doc.faculty?.id || doc.facultyId || '')
   const [subjectId, setSubjectId] = useState(doc.subject?.id || doc.subjectId || '')
+  const [isLocked, setIsLocked] = useState(Boolean(doc.isLocked))
 
   const [universities, setUniversities] = useState([])
   const [faculties, setFaculties] = useState([])
@@ -57,6 +58,7 @@ export default function EditMyDocumentModal({ doc, onClose, onSave }) {
         description: description.trim(),
         documentType,
         visibility,
+        isLocked,
         academicYear: academicYear.trim() || undefined,
         universityId: universityId || null,
         facultyId: facultyId || null,
@@ -225,6 +227,25 @@ export default function EditMyDocumentModal({ doc, onClose, onSave }) {
               placeholder="Mô tả nội dung học liệu, giáo trình của thầy cô nào, đề thi kỳ nào..."
               className="w-full rounded-xl border border-slate-200 bg-[#f1f3ff]/60 p-3 text-xs text-[#141b2b] outline-none focus:bg-white focus:ring-2 focus:ring-[#00288e]"
             />
+          </div>
+
+          <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-3.5">
+            <label className="flex items-start gap-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isLocked}
+                onChange={(e) => setIsLocked(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#00288e] focus:ring-[#00288e]"
+              />
+              <div>
+                <span className="block text-xs font-bold text-[#141b2b]">
+                  Khóa tài liệu này (Yêu cầu mở khóa)
+                </span>
+                <span className="block text-[11px] text-slate-500 mt-0.5">
+                  Tài liệu bị khóa sẽ làm mờ trang đọc thử trực tuyến và yêu cầu người xem dùng 1 Credit hoặc gói Học liệu số Pass để tải file.
+                </span>
+              </div>
+            </label>
           </div>
 
           <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-4">

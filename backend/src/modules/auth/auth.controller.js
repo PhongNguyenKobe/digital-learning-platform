@@ -22,6 +22,9 @@ const publicUserSelect = {
   status: true,
   universityId: true,
   facultyId: true,
+  downloadCredits: true,
+  isPremium: true,
+  premiumExpiresAt: true,
   university: { select: { name: true, shortName: true } },
   faculty: { select: { name: true } },
 };
@@ -176,4 +179,34 @@ const changePassword = asyncHandler(async (req, res) => {
   res.json({ data: { message: 'Đổi mật khẩu thành công. Vui lòng đăng nhập lại trên các thiết bị khác.' } });
 });
 
-module.exports = { register, login, refresh, logout, me, changePassword };
+const upgradePremium = asyncHandler(async (req, res) => {
+  const plan = String(req.body.plan || 'SEMESTER').toUpperCase();
+  const now = new Date();
+  const expiresAt = new Date();
+  if (plan === 'MONTH') {
+    expiresAt.setMonth(expiresAt.getMonth() + 1);
+  } else if (plan === 'YEAR') {
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+  } else {
+    expiresAt.setMonth(expiresAt.getMonth() + 5);
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id: req.user.id },
+    data: {
+      isPremium: true,
+      premiumExpiresAt: expiresAt,
+      downloadCredits: { increment: 10 },
+    },
+    select: publicUserSelect,
+  });
+
+  res.json({
+    data: {
+      message: `Kích hoạt gói Premium (${plan}) thành công! Hạn sử dụng đến ${expiresAt.toLocaleDateString('vi-VN')}.`,
+      user: updatedUser,
+    },
+  });
+});
+
+module.exports = { register, login, refresh, logout, me, changePassword, upgradePremium };

@@ -61,6 +61,16 @@ export async function updateMyDocument(id, data) {
   return response.data
 }
 
+export async function unlockDocument(id) {
+  const response = await api.post(`/documents/${id}/unlock`)
+  return response.data
+}
+
+export async function upgradePremium(plan) {
+  const response = await api.post('/auth/upgrade-premium', { plan })
+  return response.data
+}
+
 export async function deleteMyDocument(id) {
   const response = await api.delete(`/documents/${id}`)
   return response.data

@@ -140,6 +140,37 @@ const downloadDocument = asyncHandler(async (req, res) => {
     throw httpError(404, 'File tài liệu chưa tồn tại trên storage.');
   }
 
+  // Kiểm tra quyền đối với tài liệu bị khóa (Locked Document)
+  if (document.isLocked) {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { id: true, role: true, downloadCredits: true, isPremium: true, premiumExpiresAt: true },
+    });
+    const hasActivePremium = user.isPremium && (!user.premiumExpiresAt || new Date(user.premiumExpiresAt) > new Date());
+    const isOwnerOrAdmin = user.role === 'ADMIN' || user.id === document.uploaderId;
+
+    if (!isOwnerOrAdmin && !hasActivePremium) {
+      const unlock = await prisma.documentUnlock.findUnique({
+        where: { userId_documentId: { userId: req.user.id, documentId: document.id } },
+      });
+      if (!unlock) {
+        if (user.downloadCredits < 1) {
+          throw httpError(403, 'Tài liệu này đã bị khóa. Bạn đã hết lượt tải (0 Credit). Vui lòng tải lên 1 tài liệu học tập mới hoặc nâng cấp gói Premium VIP.');
+        }
+        // Tự động trừ 1 credit và mở khóa tài liệu cho user
+        await prisma.$transaction([
+          prisma.user.update({
+            where: { id: req.user.id },
+            data: { downloadCredits: { decrement: 1 } },
+          }),
+          prisma.documentUnlock.create({
+            data: { userId: req.user.id, documentId: document.id, unlockType: 'CREDIT' },
+          }),
+        ]);
+      }
+    }
+  }
+
   await prisma.$transaction([
     prisma.download.create({
       data: {

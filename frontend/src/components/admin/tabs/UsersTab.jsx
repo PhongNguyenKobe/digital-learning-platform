@@ -61,6 +61,7 @@ export default function UsersTab({
               <th className="rounded-l-lg p-3">Họ tên & Tài khoản</th>
               <th className="p-3">Vai trò</th>
               <th className="p-3">Trường / Đơn vị</th>
+              <th className="p-3">Credits / VIP</th>
               <th className="p-3">Chỉ số Uy tín (Trust Score)</th>
               <th className="p-3">Trạng thái quyền</th>
               <th className="rounded-r-lg p-3 text-right">Tác vụ</th>
@@ -69,7 +70,7 @@ export default function UsersTab({
           <tbody className="divide-y divide-slate-100">
             {filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan="6" className="py-8 text-center text-[#444653]">
+                <td colSpan="7" className="py-8 text-center text-[#444653]">
                   Không có người dùng nào phù hợp.
                 </td>
               </tr>
@@ -110,6 +111,16 @@ export default function UsersTab({
                     </td>
                     <td className="p-3">
                       <span className="text-xs text-[#141b2b]">{u.university?.name || 'Chưa cập nhật'}</span>
+                    </td>
+                    <td className="p-3 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-[#00288e]">{u.downloadCredits ?? 2} Credits</span>
+                        {u.isPremium && (
+                          <span className="rounded-full border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-[9px] font-black text-amber-800">
+                            VIP
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="p-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">

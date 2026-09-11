@@ -5,10 +5,19 @@ export default function EditUserModal({ user, onClose, onSave }) {
   const [role, setRole] = useState(user.role || 'STUDENT')
   const [status, setStatus] = useState(user.status || 'ACTIVE')
   const [trustScore, setTrustScore] = useState(user.trustScore ?? 50)
+  const [downloadCredits, setDownloadCredits] = useState(user.downloadCredits ?? 2)
+  const [isPremium, setIsPremium] = useState(Boolean(user.isPremium))
 
   function handleSubmit(e) {
     e.preventDefault()
-    onSave({ fullName, role, status, trustScore: Number(trustScore) })
+    onSave({
+      fullName,
+      role,
+      status,
+      trustScore: Number(trustScore),
+      downloadCredits: Number(downloadCredits),
+      isPremium,
+    })
   }
 
   return (
@@ -55,6 +64,30 @@ export default function EditUserModal({ user, onClose, onSave }) {
                 <option value="ACTIVE">ACTIVE (Hoạt động)</option>
                 <option value="SUSPENDED">SUSPENDED (Tạm khóa)</option>
               </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1 block font-bold text-[#141b2b]">Lượt tải (Credits)</label>
+              <input
+                type="number"
+                min="0"
+                value={downloadCredits}
+                onChange={(e) => setDownloadCredits(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 p-2.5 outline-none focus:border-[#00288e]"
+              />
+            </div>
+            <div className="flex items-end pb-2">
+              <label className="flex items-center gap-2 font-bold text-[#00288e] cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isPremium}
+                  onChange={(e) => setIsPremium(e.target.checked)}
+                  className="h-4 w-4 rounded"
+                />
+                <span>Gói VIP Premium</span>
+              </label>
             </div>
           </div>
 

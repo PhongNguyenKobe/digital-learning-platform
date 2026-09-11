@@ -134,17 +134,28 @@ export default function DocumentsTab({
                     </div>
                   </td>
                   <td className="p-3 whitespace-nowrap">
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
-                        doc.status === 'PUBLISHED'
-                          ? 'bg-[#d9f7ed] text-[#00563a]'
-                          : doc.status === 'REJECTED'
-                          ? 'bg-[#ffdad6] text-[#ba1a1a]'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {doc.status}
-                    </span>
+                    <div className="flex flex-col items-start gap-1">
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                          doc.status === 'PUBLISHED'
+                            ? 'bg-[#d9f7ed] text-[#00563a]'
+                            : doc.status === 'REJECTED'
+                            ? 'bg-[#ffdad6] text-[#ba1a1a]'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}
+                      >
+                        {doc.status}
+                      </span>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[9px] font-bold ${
+                          doc.isLocked
+                            ? 'border border-amber-300 bg-amber-100 text-amber-900'
+                            : 'bg-emerald-50 text-emerald-800'
+                        }`}
+                      >
+                        {doc.isLocked ? 'Locked' : 'Free'}
+                      </span>
+                    </div>
                   </td>
                   <td className="p-3 text-right whitespace-nowrap">
                     <div className="flex items-center justify-end gap-1.5">

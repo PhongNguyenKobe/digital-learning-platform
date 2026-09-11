@@ -120,6 +120,7 @@ const createDocument = asyncHandler(async (req, res) => {
           language: req.body.language || 'vi',
           status,
           visibility: req.body.visibility || 'PUBLIC',
+          isLocked: req.body.isLocked === 'true' || req.body.isLocked === true,
           publishedAt: status === 'PUBLISHED' ? now : undefined,
           isVerified: false,
           processingStatus: 'QUEUED',
@@ -145,11 +146,36 @@ const createDocument = asyncHandler(async (req, res) => {
       if (req.body.categoryId) {
         await transaction.documentCategory.create({ data: { documentId: document.id, categoryId: req.body.categoryId } });
       }
-      return { document, job };
+
+      // Thưởng +2 credit cho uploader theo mô hình Give to Get của StuDocu
+      const updatedUser = await transaction.user.update({
+        where: { id: req.user.id },
+        data: { downloadCredits: { increment: 2 } },
+        select: { downloadCredits: true },
+      });
+
+      // Nếu người dùng upload để mở khóa một tài liệu mục tiêu
+      const targetUnlockId = req.body.targetUnlockId || req.query.unlockTargetDocumentId;
+      if (targetUnlockId) {
+        await transaction.documentUnlock.upsert({
+          where: { userId_documentId: { userId: req.user.id, documentId: targetUnlockId } },
+          create: { userId: req.user.id, documentId: targetUnlockId, unlockType: 'UPLOAD' },
+          update: {},
+        });
+      }
+
+      return { document, job, newCredits: updatedUser.downloadCredits };
     });
 
     processDocumentJob(result.job.id);
-    res.status(201).json({ data: serialize({ ...result.document, processingJobId: result.job.id }) });
+    res.status(201).json({
+      data: serialize({
+        ...result.document,
+        processingJobId: result.job.id,
+        awardedCredits: 2,
+        newCredits: result.newCredits,
+      }),
+    });
   } catch (error) {
     await fs.unlink(documentFile.path).catch(() => {});
     if (thumbnailFile?.path) {
@@ -195,6 +221,7 @@ const listDocuments = asyncHandler(async (req, res) => {
         academicYear: true,
         status: true,
         visibility: true,
+        isLocked: true,
         downloadCount: true,
         viewCount: true,
         ratingAverage: true,
@@ -257,7 +284,96 @@ const getDocument = asyncHandler(async (req, res) => {
     },
   });
   if (!document) throw httpError(404, 'Không tìm thấy tài liệu công khai.');
-  res.json({ data: serialize(document) });
+
+  let isUnlocked = !document.isLocked;
+  let canViewFull = !document.isLocked;
+
+  if (req.user) {
+    if (req.user.role === 'ADMIN' || req.user.id === document.uploaderId) {
+      isUnlocked = true;
+      canViewFull = true;
+    } else if (req.user.isPremium && (!req.user.premiumExpiresAt || new Date(req.user.premiumExpiresAt) > new Date())) {
+      isUnlocked = true;
+      canViewFull = true;
+    } else if (document.isLocked) {
+      const unlock = await prisma.documentUnlock.findUnique({
+        where: { userId_documentId: { userId: req.user.id, documentId: document.id } },
+      });
+      if (unlock) {
+        isUnlocked = true;
+        canViewFull = true;
+      }
+    }
+  }
+
+  res.json({
+    data: serialize({
+      ...document,
+      isUnlocked,
+      canViewFull,
+    }),
+  });
+});
+
+const unlockDocument = asyncHandler(async (req, res) => {
+  const document = await prisma.document.findFirst({
+    where: { id: req.params.id, deletedAt: null, status: 'PUBLISHED' },
+    select: { id: true, title: true, isLocked: true, uploaderId: true },
+  });
+  if (!document) throw httpError(404, 'Tài liệu không tồn tại hoặc chưa công khai.');
+
+  if (!document.isLocked) {
+    return res.json({ data: { message: 'Tài liệu này hoàn toàn miễn phí, không cần mở khóa.', unlocked: true } });
+  }
+
+  const existingUnlock = await prisma.documentUnlock.findUnique({
+    where: { userId_documentId: { userId: req.user.id, documentId: document.id } },
+  });
+  if (existingUnlock) {
+    return res.json({ data: { message: 'Bạn đã mở khóa tài liệu này trước đó.', unlocked: true } });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: req.user.id },
+    select: { id: true, role: true, downloadCredits: true, isPremium: true, premiumExpiresAt: true },
+  });
+
+  const hasActivePremium = user.isPremium && (!user.premiumExpiresAt || new Date(user.premiumExpiresAt) > new Date());
+  if (user.role === 'ADMIN' || user.id === document.uploaderId || hasActivePremium) {
+    await prisma.documentUnlock.create({
+      data: { userId: req.user.id, documentId: document.id, unlockType: hasActivePremium ? 'PREMIUM' : 'ADMIN' },
+    });
+    return res.json({
+      data: {
+        message: 'Mở khóa thành công với đặc quyền tài khoản của bạn.',
+        unlocked: true,
+        remainingCredits: user.downloadCredits,
+      },
+    });
+  }
+
+  if (user.downloadCredits < 1) {
+    throw httpError(403, 'Bạn đã hết lượt tải (0 Credit). Vui lòng đăng tải 1 tài liệu học tập mới (Give-to-Get) hoặc nâng cấp gói Premium VIP để mở khóa.');
+  }
+
+  const [updatedUser] = await prisma.$transaction([
+    prisma.user.update({
+      where: { id: req.user.id },
+      data: { downloadCredits: { decrement: 1 } },
+      select: { downloadCredits: true },
+    }),
+    prisma.documentUnlock.create({
+      data: { userId: req.user.id, documentId: document.id, unlockType: 'CREDIT' },
+    }),
+  ]);
+
+  res.json({
+    data: {
+      message: 'Mở khóa tài liệu thành công!',
+      unlocked: true,
+      remainingCredits: updatedUser.downloadCredits,
+    },
+  });
 });
 
 const listMyDocuments = asyncHandler(async (req, res) => {
@@ -272,7 +388,7 @@ const listMyDocuments = asyncHandler(async (req, res) => {
       orderBy: { createdAt: 'desc' },
       select: {
         id: true, title: true, slug: true, documentType: true, fileFormat: true,
-        thumbnailUrl: true,
+        thumbnailUrl: true, isLocked: true,
         status: true, processingStatus: true, pageCount: true, downloadCount: true,
         viewCount: true, ratingAverage: true, ratingCount: true, createdAt: true,
         publishedAt: true, rejectionReason: true,
@@ -304,9 +420,11 @@ const updateMyDocument = asyncHandler(async (req, res) => {
     visibility,
     academicYear,
     categoryId,
+    isLocked,
   } = req.body;
 
   const data = {};
+  if (isLocked !== undefined) data.isLocked = Boolean(isLocked);
   if (title !== undefined) {
     const trimmed = String(title).trim();
     if (!trimmed) throw httpError(400, 'Tiêu đề không được để trống.');
@@ -456,6 +574,7 @@ module.exports = {
   createDocument,
   listDocuments,
   getDocument,
+  unlockDocument,
   listMyDocuments,
   updateMyDocument,
   deleteMyDocument,

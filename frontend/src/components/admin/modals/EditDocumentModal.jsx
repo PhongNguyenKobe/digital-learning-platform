@@ -16,6 +16,7 @@ export default function EditDocumentModal({
   const [facultyId, setFacultyId] = useState(doc.facultyId || '')
   const [subjectId, setSubjectId] = useState(doc.subjectId || '')
   const [categoryId, setCategoryId] = useState(doc.categoryId || '')
+  const [isLocked, setIsLocked] = useState(Boolean(doc.isLocked))
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -23,6 +24,7 @@ export default function EditDocumentModal({
       title,
       description,
       status,
+      isLocked,
       universityId: universityId || null,
       facultyId: facultyId || null,
       subjectId: subjectId || null,
@@ -88,6 +90,18 @@ export default function EditDocumentModal({
                 ))}
               </select>
             </div>
+          </div>
+
+          <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3">
+            <label className="flex items-center gap-2 font-bold text-amber-900 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isLocked}
+                onChange={(e) => setIsLocked(e.target.checked)}
+                className="h-4 w-4 rounded text-[#00288e]"
+              />
+              <span>Khóa tài liệu (Cần Credit hoặc VIP để tải)</span>
+            </label>
           </div>
 
           <div className="mt-5 flex justify-end gap-2 border-t pt-4">
