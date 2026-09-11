@@ -321,11 +321,6 @@ function DocumentDetailsPage() {
                     {/* Hộp thoại kêu gọi mở khóa */}
                     <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-linear-to-b from-slate-900/60 via-slate-900/85 to-slate-900/95 p-6 text-center text-white backdrop-blur-[1px]">
                       <div className="w-full max-w-lg rounded-2xl border border-white/20 bg-slate-900/85 p-6 shadow-2xl backdrop-blur-md sm:p-7">
-                        <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-amber-400/20 text-amber-400">
-                          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                          </svg>
-                        </div>
                         <h3 className="text-lg font-black tracking-tight text-white sm:text-xl">
                           Nội dung tài liệu đã bị khóa
                         </h3>
@@ -409,7 +404,6 @@ function DocumentDetailsPage() {
                 </div>
               )}
               </div>
-            </div>
 
             {/* Khối Bình luận */}
             <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -529,13 +523,19 @@ function DocumentDetailsPage() {
       />
     </div>
   )
+}
+
 function PageOnePreview({ apiOrigin, thumbnailUrl, fileUrl, title }) {
   const canvasRef = useRef(null)
-  const [loadingPdf, setLoadingPdf] = useState(!thumbnailUrl && Boolean(fileUrl))
-  const [hasRendered, setHasRendered] = useState(Boolean(thumbnailUrl))
+  const thumbnailSrc = thumbnailUrl
+    ? (thumbnailUrl.startsWith('http') ? thumbnailUrl : `${apiOrigin}${thumbnailUrl}`)
+    : ''
+  const [thumbnailAvailable, setThumbnailAvailable] = useState(Boolean(thumbnailSrc))
+  const [loadingPdf, setLoadingPdf] = useState(!thumbnailSrc && Boolean(fileUrl))
+  const [hasRendered, setHasRendered] = useState(false)
 
   useEffect(() => {
-    if (thumbnailUrl || !fileUrl) return
+    if (thumbnailAvailable || !fileUrl) return
 
     let cancelled = false
     async function renderPage1() {
@@ -582,15 +582,16 @@ function PageOnePreview({ apiOrigin, thumbnailUrl, fileUrl, title }) {
     return () => {
       cancelled = true
     }
-  }, [fileUrl, thumbnailUrl])
+  }, [fileUrl, thumbnailAvailable])
 
-  if (thumbnailUrl) {
+  if (thumbnailAvailable) {
     return (
       <div className="flex justify-center bg-slate-100 p-2 sm:p-4">
         <img
-          src={`${apiOrigin}${thumbnailUrl}`}
+          src={thumbnailSrc}
           alt={title || 'Trang 1 xem thử'}
           className="w-full max-w-2xl h-auto rounded-lg shadow-md border border-slate-200 object-contain block bg-white"
+          onError={() => setThumbnailAvailable(false)}
         />
       </div>
     )
