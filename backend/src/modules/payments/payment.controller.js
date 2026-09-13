@@ -55,6 +55,20 @@ const createVnpayPayment = asyncHandler(async (req, res) => {
   res.status(201).json({ data: { paymentUrl, txnRef: payment.txnRef, expiresAt: payment.expiresAt } });
 });
 
+const listMyPayments = asyncHandler(async (req, res) => {
+  const payments = await prisma.payment.findMany({
+    where: { userId: req.user.id },
+    orderBy: { createdAt: 'desc' },
+    take: 50,
+    select: {
+      id: true, provider: true, txnRef: true, plan: true, amount: true, status: true,
+      vnpTransactionNo: true, bankCode: true, responseCode: true, paidAt: true,
+      expiresAt: true, createdAt: true,
+    },
+  });
+  res.json({ data: payments });
+});
+
 const vnpayReturn = asyncHandler(async (req, res) => {
   const result = await settlePayment(req.query);
   const message = result.status === 'success' ? 'Thanh toán thành công. Premium đã được kích hoạt.' : 'Thanh toán chưa thành công hoặc đã bị hủy.';
@@ -66,4 +80,4 @@ const vnpayIpn = asyncHandler(async (req, res) => {
   res.json({ RspCode: result.code, Message: result.message });
 });
 
-module.exports = { createVnpayPayment, vnpayReturn, vnpayIpn };
+module.exports = { createVnpayPayment, listMyPayments, vnpayReturn, vnpayIpn };

@@ -22,6 +22,7 @@ module.exports = {
   publishImmediately: process.env.PUBLISH_DOCUMENTS_IMMEDIATELY !== 'false',
   purgeCronSchedule: process.env.PURGE_CRON_SCHEDULE || '0 3 * * *',
   corsOrigins: (process.env.CORS_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173').split(',').map((origin) => origin.trim()).filter(Boolean),
+  allowNgrokOrigins: process.env.ALLOW_NGROK_ORIGINS === 'true',
   pdfTextCommand: process.env.PDF_TEXT_COMMAND || 'pdftotext',
   pdfImageCommand: process.env.PDF_IMAGE_COMMAND || 'pdftoppm',
   clamAvCommand: process.env.CLAMAV_COMMAND || 'clamscan',

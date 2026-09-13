@@ -6,6 +6,7 @@ import {
   fetchMyDocuments,
   fetchMyFavorites,
   fetchMyDownloads,
+  fetchMyPayments,
   updateMyDocument,
   deleteMyDocument,
   toggleFavorite,
@@ -22,6 +23,7 @@ export default function LibraryPage() {
   const [myDocuments, setMyDocuments] = useState([])
   const [favorites, setFavorites] = useState([])
   const [downloads, setDownloads] = useState([])
+  const [payments, setPayments] = useState([])
   const [loading, setLoading] = useState(true)
 
   // Filters & View Mode
@@ -49,19 +51,21 @@ export default function LibraryPage() {
     async function loadAll() {
       setLoading(true)
       try {
-        const [meRes, docsRes, favsRes, downsRes] = await Promise.all([
+        const [meRes, docsRes, favsRes, downsRes, paymentsRes] = await Promise.all([
           fetchCurrentUser().catch(() => null),
           fetchMyDocuments({ limit: 100 }).catch(() => ({ data: [] })),
           fetchMyFavorites().catch(() => ({ data: [] })),
           fetchMyDownloads().catch(() => ({ data: [] })),
+          fetchMyPayments().catch(() => ({ data: [] })),
         ])
         if (!cancelled) {
           if (meRes?.data) setUser(meRes.data)
           if (docsRes?.data) setMyDocuments(docsRes.data)
           if (favsRes?.data) setFavorites(favsRes.data)
           if (downsRes?.data) setDownloads(downsRes.data)
+          if (paymentsRes?.data) setPayments(paymentsRes.data)
         }
-      } catch (err) {
+      } catch {
         if (!cancelled) showNotice('Không thể tải thông tin thư viện.', 'error')
       } finally {
         if (!cancelled) setLoading(false)
@@ -116,7 +120,7 @@ export default function LibraryPage() {
       await toggleFavorite(docId, false)
       setFavorites((prev) => prev.filter((d) => d.id !== docId))
       showNotice('Đã bỏ lưu tài liệu khỏi mục yêu thích.')
-    } catch (err) {
+    } catch {
       showNotice('Không thể cập nhật danh sách yêu thích.', 'error')
     }
   }
@@ -833,6 +837,20 @@ export default function LibraryPage() {
                   </button>
                 </div>
               </form>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xs lg:col-span-12">
+              <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <span className="material-symbols-outlined text-[24px] text-[#00563a]">receipt_long</span>
+                <div><h3 className="text-base font-bold text-[#141b2b]">Lịch sử thanh toán Premium</h3><p className="text-[11px] text-[#757684]">Các giao dịch VNPay gần nhất của tài khoản.</p></div>
+              </div>
+              {payments.length === 0 ? (
+                <p className="py-8 text-center text-xs text-[#757684]">Chưa có giao dịch thanh toán nào.</p>
+              ) : (
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full min-w-160 text-left text-xs"><thead className="bg-[#f1f3ff] text-[#444653]"><tr><th className="rounded-l-lg p-3">Thời gian</th><th className="p-3">Gói</th><th className="p-3">Số tiền</th><th className="p-3">Mã đơn hàng</th><th className="p-3">Mã giao dịch VNPay</th><th className="rounded-r-lg p-3">Trạng thái</th></tr></thead><tbody className="divide-y divide-slate-100">{payments.map((payment) => <tr key={payment.id}><td className="p-3 text-[#444653]">{new Date(payment.createdAt).toLocaleString('vi-VN')}</td><td className="p-3 font-semibold text-[#141b2b]">{{ MONTH: '1 tháng', SEMESTER: '1 học kỳ', YEAR: '1 năm' }[payment.plan] || payment.plan}</td><td className="p-3 font-bold text-[#00288e]">{Number(payment.amount).toLocaleString('vi-VN')}đ</td><td className="p-3 font-mono text-[11px] text-[#444653]">{payment.txnRef}</td><td className="p-3 font-mono text-[11px] text-[#444653]">{payment.vnpTransactionNo || '—'}</td><td className="p-3"><span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${payment.status === 'PAID' ? 'bg-[#d9f7ed] text-[#00563a]' : payment.status === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-700'}`}>{payment.status === 'PAID' ? 'Đã thanh toán' : payment.status === 'PENDING' ? 'Chờ thanh toán' : payment.status === 'EXPIRED' ? 'Đã hết hạn' : 'Thất bại'}</span></td></tr>)}</tbody></table>
+                </div>
+              )}
             </div>
           </div>
         )}

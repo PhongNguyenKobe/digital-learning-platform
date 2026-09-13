@@ -71,6 +71,11 @@ export async function createVnpayPayment(plan) {
   return response.data
 }
 
+export async function fetchMyPayments() {
+  const response = await api.get('/payments/mine')
+  return response.data
+}
+
 export async function deleteMyDocument(id) {
   const response = await api.delete(`/documents/${id}`)
   return response.data

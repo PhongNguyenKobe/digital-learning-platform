@@ -32,7 +32,7 @@ const plans = [
   },
 ]
 
-function PremiumModal({ isOpen, onClose, onSuccess, userCredits = 0 }) {
+function PremiumModal({ isOpen, onClose }) {
   const [selectedPlan, setSelectedPlan] = useState('SEMESTER')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')

@@ -1,4 +1,3 @@
-const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -15,8 +14,22 @@ const { thumbnailDirectory } = require('./middlewares/upload');
 
 const app = express();
 
+function isAllowedOrigin(origin) {
+  if (!origin || env.corsOrigins.includes(origin)) return true;
+  if (!env.allowNgrokOrigins) return false;
+  return /^https:\/\/[a-z0-9-]+\.(ngrok-free\.app|ngrok-free\.dev|ngrok\.io|ngrok\.app)$/i.test(origin);
+}
+
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-app.use(cors({ origin(origin, callback) { if (!origin || env.corsOrigins.includes(origin)) return callback(null, true); return callback(new Error('Origin không được phép truy cập API.')); }, credentials: false }));
+app.use(cors({
+  origin(origin, callback) {
+    if (isAllowedOrigin(origin)) return callback(null, true);
+    const error = new Error('Origin không được phép truy cập API.');
+    error.statusCode = 403;
+    return callback(error);
+  },
+  credentials: false,
+}));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: 'draft-8', legacyHeaders: false }));
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
