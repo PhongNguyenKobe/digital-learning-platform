@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { upgradePremium } from '../services/api'
+import { createVnpayPayment } from '../services/api'
 
 const plans = [
   {
@@ -36,17 +36,16 @@ function PremiumModal({ isOpen, onClose, onSuccess, userCredits = 0 }) {
   const [selectedPlan, setSelectedPlan] = useState('SEMESTER')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [showQr, setShowQr] = useState(false)
 
   if (!isOpen) return null
 
-  async function handleActivate() {
+  async function handlePayment() {
     setLoading(true)
     setError('')
     try {
-      const res = await upgradePremium(selectedPlan)
-      if (onSuccess) onSuccess(res.data?.user || res.data)
-      onClose()
+      const res = await createVnpayPayment(selectedPlan)
+      if (!res.data?.paymentUrl) throw new Error('Không thể tạo liên kết thanh toán VNPay.')
+      window.location.assign(res.data.paymentUrl)
     } catch (err) {
       setError(err.response?.data?.error?.message || 'Không thể nâng cấp gói. Vui lòng thử lại.')
     } finally {
@@ -138,32 +137,9 @@ function PremiumModal({ isOpen, onClose, onSuccess, userCredits = 0 }) {
 
           {error && <div className="mt-4 rounded-lg bg-rose-50 p-3 text-xs text-rose-700">{error}</div>}
 
-          {/* Tab chuyển đổi thanh toán QR demo */}
-          {showQr ? (
-            <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50/50 p-4 text-center">
-              <p className="text-xs font-semibold text-slate-700">Quét mã QR để thanh toán gói {activePlanObj?.title} ({activePlanObj?.price}đ)</p>
-              <div className="mx-auto my-3 flex h-36 w-36 items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-white shadow-inner">
-                <div className="text-center">
-                  <span className="text-3xl">📱</span>
-                  <p className="mt-1 text-[11px] font-bold text-blue-800">VietQR / MoMo</p>
-                  <p className="text-[9px] text-slate-400">DEMO SIMULATOR</p>
-                </div>
-              </div>
-              <p className="text-[11px] text-slate-500">
-                Sau khi quét mã, bấm <strong>"Xác nhận kích hoạt"</strong> bên dưới để hệ thống cấp quyền VIP ngay.
-              </p>
-            </div>
-          ) : null}
-
           {/* Action buttons */}
           <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-            <button
-              className="text-xs font-semibold text-slate-500 hover:text-blue-800 underline"
-              onClick={() => setShowQr(!showQr)}
-              type="button"
-            >
-              {showQr ? '← Ẩn mã QR' : '💳 Xem mã QR thanh toán chuyển khoản'}
-            </button>
+            <span className="text-xs text-slate-500">Bạn sẽ được chuyển đến cổng thanh toán VNPay Sandbox.</span>
             <div className="flex gap-2">
               <button
                 className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
@@ -175,10 +151,10 @@ function PremiumModal({ isOpen, onClose, onSuccess, userCredits = 0 }) {
               <button
                 className="flex items-center justify-center gap-1.5 rounded-lg bg-[#00288e] px-6 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-[#002070] disabled:opacity-50"
                 disabled={loading}
-                onClick={handleActivate}
+                onClick={handlePayment}
                 type="button"
               >
-                {loading ? 'Đang kích hoạt...' : `Kích hoạt ngay (${activePlanObj?.price}đ)`}
+                {loading ? 'Đang chuyển đến VNPay...' : `Thanh toán VNPay (${activePlanObj?.price}đ)`}
               </button>
             </div>
           </div>

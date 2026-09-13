@@ -8,6 +8,7 @@ import HomePage from './pages/HomePage'
 import LibraryPage from './pages/LibraryPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import VnpayReturnPage from './pages/VnpayReturnPage'
 import { fetchCurrentUser } from './services/api'
 
 function ProtectedRoute({ children }) {
@@ -41,6 +42,7 @@ function App() {
           <Route element={<LoginPage />} path="/dang-nhap" />
           <Route element={<LoginPage />} path="/login" />
           <Route element={<RegisterPage />} path="/dang-ky" />
+          <Route element={<VnpayReturnPage />} path="/thanh-toan/vnpay-return" />
           <Route element={<ProtectedRoute><LibraryPage /></ProtectedRoute>} path="/thu-vien" />
           <Route element={<DocumentDetailsPage />} path="/tai-lieu/:id" />
           <Route element={<ProtectedRoute><ContributorDashboardPage /></ProtectedRoute>} path="/dong-gop" />

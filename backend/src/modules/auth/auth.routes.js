@@ -12,6 +12,5 @@ router.post('/refresh', authenticationLimiter, controller.refresh);
 router.post('/logout', authenticate, controller.logout);
 router.get('/me', authenticate, controller.me);
 router.patch('/password', authenticate, controller.changePassword);
-router.post('/upgrade-premium', authenticate, controller.upgradePremium);
 
 module.exports = router;

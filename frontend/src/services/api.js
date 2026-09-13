@@ -66,8 +66,8 @@ export async function unlockDocument(id) {
   return response.data
 }
 
-export async function upgradePremium(plan) {
-  const response = await api.post('/auth/upgrade-premium', { plan })
+export async function createVnpayPayment(plan) {
+  const response = await api.post('/payments/vnpay/create', { plan })
   return response.data
 }
 

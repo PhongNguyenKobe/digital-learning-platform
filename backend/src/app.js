@@ -9,6 +9,7 @@ const authRoutes = require('./modules/auth/auth.routes');
 const documentRoutes = require('./modules/documents/document.routes');
 const interactionRoutes = require('./modules/interactions/interaction.routes');
 const adminRoutes = require('./modules/admin/admin.routes');
+const paymentRoutes = require('./modules/payments/payment.routes');
 const errorHandler = require('./middlewares/errorHandler');
 const { thumbnailDirectory } = require('./middlewares/upload');
 
@@ -34,6 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api', interactionRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/payments', paymentRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: { message: 'Không tìm thấy endpoint.' } });

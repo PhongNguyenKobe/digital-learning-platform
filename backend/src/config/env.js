@@ -1,6 +1,7 @@
 const dotenv = require('dotenv');
 
 dotenv.config();
+dotenv.config({ path: '.env.local', override: true });
 
 function required(name, fallback) {
   const value = process.env[name] || fallback;
@@ -25,4 +26,9 @@ module.exports = {
   pdfImageCommand: process.env.PDF_IMAGE_COMMAND || 'pdftoppm',
   clamAvCommand: process.env.CLAMAV_COMMAND || 'clamscan',
   documentWorkerIntervalMs: Number(process.env.DOCUMENT_WORKER_INTERVAL_MS || 15000),
+  frontendUrl: (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, ''),
+  vnpTmnCode: process.env.VNP_TMNCODE || '',
+  vnpHashSecret: process.env.VNP_HASH_SECRET || '',
+  vnpUrl: process.env.VNP_URL || 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
+  vnpReturnUrl: process.env.VNP_RETURN_URL || 'http://localhost:3000/api/payments/vnpay/return',
 };

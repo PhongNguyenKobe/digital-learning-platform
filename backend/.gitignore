@@ -1,0 +1,4 @@
+# Local runtime configuration: never commit payment/JWT/database secrets.
+.env
+.env.local
+.env.production
