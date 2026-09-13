@@ -6,6 +6,10 @@ const asyncHandler = require('../../utils/asyncHandler');
 const httpError = require('../../utils/httpError');
 const slugify = require('../../utils/slug');
 const { processDocumentJob } = require('../../services/documentProcessing.service');
+const { watermarkThumbnail } = require('../../services/thumbnailWatermark.service');
+const { watermarkPdf } = require('../../services/pdfWatermark.service');
+const { createPdfCover } = require('../../services/pdfPreview.service');
+const { thumbnailDirectory } = require('../../middlewares/upload');
 
 const validDocumentTypes = new Set(['TEXTBOOK', 'EXAM', 'LECTURE_NOTE', 'SUMMARY', 'THESIS', 'RESEARCH_PAPER', 'ASSIGNMENT', 'OTHER']);
 const validSortFields = new Set(['downloadCount', 'ratingAverage', 'createdAt', 'title']);
@@ -57,7 +61,7 @@ async function uniqueSlug(title) {
 
 const createDocument = asyncHandler(async (req, res) => {
   const documentFile = req.file || req.files?.file?.[0];
-  const thumbnailFile = req.files?.thumbnail?.[0];
+  let thumbnailFile = req.files?.thumbnail?.[0];
 
   if (!documentFile) {
     throw httpError(400, 'File tài liệu là bắt buộc và phải gửi bằng field `file`.');
@@ -94,8 +98,11 @@ const createDocument = asyncHandler(async (req, res) => {
   const status = env.publishImmediately ? 'PUBLISHED' : 'PENDING_REVIEW';
   const now = new Date();
   const fileFormat = mimeToFormat[documentFile.mimetype] || 'OTHER';
+  if (fileFormat === 'PDF') await watermarkPdf(documentFile.path, req.user.fullName);
+  if (!thumbnailFile && fileFormat === 'PDF') thumbnailFile = await createPdfCover(documentFile.path, thumbnailDirectory);
   const metadata = parseOptionalJson(req.body.metadata, 'metadata');
   const fileUrl = `/uploads/${path.basename(documentFile.path)}`;
+  if (thumbnailFile) thumbnailFile = await watermarkThumbnail(thumbnailFile, title);
   const thumbnailUrl = thumbnailFile ? `/uploads/thumbnails/${path.basename(thumbnailFile.path)}` : null;
 
   try {
@@ -313,6 +320,50 @@ const getDocument = asyncHandler(async (req, res) => {
       canViewFull,
     }),
   });
+});
+
+const streamDocumentContent = asyncHandler(async (req, res) => {
+  const document = await prisma.document.findFirst({
+    where: { id: req.params.id, deletedAt: null, status: 'PUBLISHED', visibility: 'PUBLIC' },
+    select: { id: true, fileUrl: true, originalFileName: true, fileFormat: true, isLocked: true, uploaderId: true },
+  });
+  if (!document) throw httpError(404, 'Không tìm thấy tài liệu công khai.');
+
+  let canView = !document.isLocked;
+  if (document.isLocked && req.user) {
+    const isOwnerOrAdmin = req.user.role === 'ADMIN' || req.user.id === document.uploaderId;
+    const hasPremium = req.user.isPremium && (!req.user.premiumExpiresAt || new Date(req.user.premiumExpiresAt) > new Date());
+    const unlock = !isOwnerOrAdmin && !hasPremium
+      ? await prisma.documentUnlock.findUnique({ where: { userId_documentId: { userId: req.user.id, documentId: document.id } } })
+      : true;
+    canView = Boolean(isOwnerOrAdmin || hasPremium || unlock);
+  }
+  if (!canView) throw httpError(403, 'Tài liệu này cần được mở khóa trước khi đọc toàn bộ.');
+
+  const filePath = path.resolve(process.cwd(), env.uploadDir, path.basename(document.fileUrl));
+  try { await fs.access(filePath); } catch { throw httpError(404, 'File tài liệu chưa tồn tại trên storage.'); }
+  const mimeType = Object.entries(mimeToFormat).find(([, format]) => format === document.fileFormat)?.[0] || 'application/octet-stream';
+  res.set({ 'Content-Type': mimeType, 'Content-Disposition': `inline; filename*=UTF-8''${encodeURIComponent(document.originalFileName)}`, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': document.isLocked ? 'private, no-store' : 'private, max-age=300' });
+  return res.sendFile(filePath);
+});
+
+const previewDocument = asyncHandler(async (req, res) => {
+  const document = await prisma.document.findFirst({ where: { id: req.params.id, deletedAt: null, status: 'PUBLISHED', visibility: 'PUBLIC' }, select: { id: true, title: true, fileUrl: true, fileFormat: true, thumbnailUrl: true } });
+  if (!document) throw httpError(404, 'Không tìm thấy tài liệu công khai.');
+  let thumbnailUrl = document.thumbnailUrl;
+  if (!thumbnailUrl && document.fileFormat === 'PDF') {
+    const cover = await createPdfCover(path.resolve(process.cwd(), env.uploadDir, path.basename(document.fileUrl)), thumbnailDirectory);
+    if (cover) {
+      const watermarked = await watermarkThumbnail(cover, document.title);
+      thumbnailUrl = `/uploads/thumbnails/${watermarked.filename}`;
+      await prisma.document.update({ where: { id: document.id }, data: { thumbnailUrl } });
+    }
+  }
+  if (!thumbnailUrl) throw httpError(404, 'Chưa thể tạo bản xem trước cho định dạng này.');
+  const previewPath = path.resolve(thumbnailDirectory, path.basename(thumbnailUrl));
+  try { await fs.access(previewPath); } catch { throw httpError(404, 'Ảnh xem trước chưa tồn tại trên storage.'); }
+  res.set({ 'Content-Type': 'image/webp', 'Cache-Control': 'public, max-age=604800, immutable', 'X-Content-Type-Options': 'nosniff' });
+  return res.sendFile(previewPath);
 });
 
 const unlockDocument = asyncHandler(async (req, res) => {
@@ -574,6 +625,8 @@ module.exports = {
   createDocument,
   listDocuments,
   getDocument,
+  streamDocumentContent,
+  previewDocument,
   unlockDocument,
   listMyDocuments,
   updateMyDocument,

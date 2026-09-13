@@ -37,10 +37,11 @@ async function authenticate(req, res, next) {
 async function optionalAuthenticate(req, res, next) {
   try {
     const authorization = req.headers.authorization;
-    if (!authorization || !authorization.startsWith('Bearer ')) {
+    const queryToken = typeof req.query.previewToken === 'string' ? req.query.previewToken : null;
+    if ((!authorization || !authorization.startsWith('Bearer ')) && !queryToken) {
       return next();
     }
-    const token = authorization.slice(7);
+    const token = queryToken || authorization.slice(7);
     const payload = jwt.verify(token, env.jwtAccessSecret);
     if (payload.type === 'access') {
       const user = await prisma.user.findUnique({

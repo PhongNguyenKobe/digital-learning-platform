@@ -54,7 +54,11 @@ function DocumentDetailsPage() {
     }
   }, [id, token])
 
-  const fileUrl = useMemo(() => (document?.fileUrl ? `${apiOrigin}${document.fileUrl}` : ''), [document])
+  const fileUrl = useMemo(() => {
+    if (!document) return ''
+    const params = document.isLocked && token ? `?previewToken=${encodeURIComponent(token)}` : ''
+    return `${apiOrigin}/api/documents/${id}/content${params}`
+  }, [document, id, token])
 
   async function submitComment(event) {
     event.preventDefault()
@@ -299,7 +303,7 @@ function DocumentDetailsPage() {
                     <PageOnePreview
                       apiOrigin={apiOrigin}
                       thumbnailUrl={document.thumbnailUrl}
-                      fileUrl={fileUrl}
+                      fileUrl={`${apiOrigin}/api/documents/${id}/preview`}
                       title={document.title}
                     />
                   </div>
