@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   fetchAdminStats,
+  fetchAdminPayments,
   fetchAdminReports,
   updateAdminReport,
   fetchAdminAllDocuments,
@@ -43,6 +44,7 @@ import UsersTab from '../components/admin/tabs/UsersTab'
 import CatalogsTab from '../components/admin/tabs/CatalogsTab'
 import AuditLogsTab from '../components/admin/tabs/AuditLogsTab'
 import SettingsTab from '../components/admin/tabs/SettingsTab'
+import PaymentsTab from '../components/admin/tabs/PaymentsTab'
 
 import EditDocumentModal from '../components/admin/modals/EditDocumentModal'
 import EditUserModal from '../components/admin/modals/EditUserModal'
@@ -90,6 +92,10 @@ export default function AdminDashboardPage() {
 
   // Audit Logs
   const [auditLogs, setAuditLogs] = useState([])
+  const [payments, setPayments] = useState([])
+  const [paymentSummary, setPaymentSummary] = useState({})
+  const [paymentQuery, setPaymentQuery] = useState('')
+  const [paymentStatus, setPaymentStatus] = useState('')
 
   // Modal State: { type: string, data?: any }
   const [modalState, setModalState] = useState(null)
@@ -149,6 +155,12 @@ export default function AdminDashboardPage() {
         } else if (activeTab === 'audit_logs') {
           const res = await fetchAdminAuditLogs({ limit: 60 }).catch(() => ({ data: [] }))
           if (!cancelled && res.data) setAuditLogs(res.data)
+        } else if (activeTab === 'payments' && canManageSystem) {
+          const res = await fetchAdminPayments({ limit: 100, q: paymentQuery || undefined, status: paymentStatus || undefined })
+          if (!cancelled) {
+            setPayments(res.data || [])
+            setPaymentSummary(res.summary || {})
+          }
         } else if (activeTab === 'overview') {
           const [sRes, rRes] = await Promise.all([
             fetchAdminStats().catch(() => null),
@@ -167,7 +179,7 @@ export default function AdminDashboardPage() {
     }
     loadTabData()
     return () => { cancelled = true }
-  }, [activeTab, docSearch, userSearch])
+  }, [activeTab, docSearch, userSearch, paymentQuery, paymentStatus, canManageSystem])
 
   // --- ACTIONS: MODERATION ---
   async function handleResolveReport(id, resolution, note = '') {
@@ -463,6 +475,8 @@ export default function AdminDashboardPage() {
           )}
 
           {activeTab === 'audit_logs' && <AuditLogsTab auditLogs={auditLogs} />}
+
+          {activeTab === 'payments' && canManageSystem && <PaymentsTab payments={payments} summary={paymentSummary} query={paymentQuery} setQuery={setPaymentQuery} status={paymentStatus} setStatus={setPaymentStatus} />}
 
           {activeTab === 'settings' && (
             <SettingsTab onTriggerPurge={handleTriggerPurge} purging={purging} />

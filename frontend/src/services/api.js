@@ -145,6 +145,11 @@ export async function fetchAdminReports(params) {
   return response.data
 }
 
+export async function fetchAdminPayments(params) {
+  const response = await api.get('/admin/payments', { params })
+  return response.data
+}
+
 export async function fetchAdminFlaggedDocuments(params) {
   const response = await api.get('/admin/flagged-documents', { params })
   return response.data

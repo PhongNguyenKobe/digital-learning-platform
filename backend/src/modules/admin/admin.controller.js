@@ -656,6 +656,30 @@ const listAuditLogs = asyncHandler(async (req, res) => {
 });
 
 // 15. Dọn dẹp dữ liệu rác (Purge Trigger)
+const listPaymentsAdmin = asyncHandler(async (req, res) => {
+  const page = pageValue(req.query.page, 1, 100000);
+  const limit = pageValue(req.query.limit, 30, 100);
+  const status = req.query.status ? String(req.query.status).toUpperCase() : undefined;
+  const q = req.query.q ? String(req.query.q).trim() : undefined;
+  const where = {
+    ...(status ? { status } : {}),
+    ...(q ? { OR: [
+      { txnRef: { contains: q, mode: 'insensitive' } },
+      { vnpTransactionNo: { contains: q, mode: 'insensitive' } },
+      { user: { email: { contains: q, mode: 'insensitive' } } },
+      { user: { fullName: { contains: q, mode: 'insensitive' } } },
+    ] } : {}),
+  };
+  const [payments, total, revenue, grouped] = await prisma.$transaction([
+    prisma.payment.findMany({ where, skip: (page - 1) * limit, take: limit, orderBy: { createdAt: 'desc' }, include: { user: { select: { id: true, fullName: true, email: true } } } }),
+    prisma.payment.count({ where }),
+    prisma.payment.aggregate({ where: { status: 'PAID' }, _sum: { amount: true }, _count: { _all: true } }),
+    prisma.payment.groupBy({ by: ['status'], _count: { _all: true } }),
+  ]);
+  const counts = Object.fromEntries(grouped.map((item) => [item.status, item._count._all]));
+  res.json({ data: serialize(payments), meta: { page, limit, total, totalPages: Math.ceil(total / limit) }, summary: { totalRevenue: revenue._sum.amount || 0, paidCount: revenue._count._all, pendingCount: counts.PENDING || 0, failedCount: (counts.FAILED || 0) + (counts.EXPIRED || 0) } });
+});
+
 const triggerPurgeDeleted = asyncHandler(async (req, res) => {
   const retentionDays = Number.parseInt(req.body?.retentionDays || 30, 10);
   const result = await purgeExpiredRecords({ retentionDays: Number.isNaN(retentionDays) ? 30 : retentionDays });
@@ -700,5 +724,6 @@ module.exports = {
   updateCategory,
   deleteCategory,
   listAuditLogs,
+  listPaymentsAdmin,
   triggerPurgeDeleted,
 };

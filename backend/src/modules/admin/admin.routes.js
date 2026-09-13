@@ -29,6 +29,7 @@ router.patch('/users/:id', adminOnly, controller.updateUserDetails);
 router.patch('/users/:id/role', adminOnly, controller.updateUserRole);
 router.patch('/users/:id/status', adminOnly, controller.updateUserStatus);
 router.delete('/users/:id', adminOnly, controller.deleteUser);
+router.get('/payments', adminOnly, controller.listPaymentsAdmin);
 
 router.get('/catalog/universities', adminOnly, controller.listUniversitiesAdmin);
 router.post('/catalog/universities', adminOnly, controller.createUniversity);

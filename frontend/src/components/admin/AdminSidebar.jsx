@@ -12,6 +12,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, reportsCount = 0
           <NavItem active={activeTab === 'documents'} onClick={() => setActiveTab('documents')} icon="library_books" label="Kiểm duyệt tài liệu" />
           {canManageSystem && <>
             <NavItem active={activeTab === 'users'} onClick={() => setActiveTab('users')} icon="verified_user" label="Người dùng" />
+            <NavItem active={activeTab === 'payments'} onClick={() => setActiveTab('payments')} icon="payments" label="Doanh thu & thanh toán" />
             <div className="my-2 border-t border-white/10" />
             <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-[#b8c4ff]/60">Phân cấp học thuật</span>
             <NavItem active={activeTab === 'universities'} onClick={() => setActiveTab('universities')} icon="account_balance" label="Trường đại học" />
