@@ -5,7 +5,8 @@ import { loginUser } from '../services/api'
 function LoginPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/'
+  const requestedRedirect = searchParams.get('redirect')
+  const redirect = requestedRedirect || '/'
   const isAdminLogin = redirect === '/admin'
 
   const [email, setEmail] = useState('')
@@ -30,7 +31,12 @@ function LoginPage() {
       localStorage.setItem('hls_refresh_token', response.data.refreshToken)
       if (remember) localStorage.setItem('hls_remember', 'true')
       window.dispatchEvent(new Event('hls-auth-changed'))
-      navigate(redirect, { replace: true })
+      const roleLandingPage = response.data.user?.role === 'ADMIN'
+        ? '/admin'
+        : response.data.user?.role === 'MODERATOR'
+          ? '/kiem-duyet'
+          : '/'
+      navigate(requestedRedirect || roleLandingPage, { replace: true })
     } catch (requestError) {
       setError(requestError.response?.data?.error?.message || 'Email hoặc mật khẩu không chính xác.')
     } finally {

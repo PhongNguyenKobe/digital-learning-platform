@@ -10,6 +10,19 @@ const server = app.listen(env.port, () => {
   initDocumentProcessor();
 });
 
+server.on('error', (error) => {
+  console.error('KhÃ´ng thá»ƒ khởi động HTTP server:', error);
+  if (error.code === 'EADDRINUSE') process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Lỗi không được xử lý của backend:', error);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Promise rejection không được xử lý của backend:', reason);
+});
+
 async function shutdown(signal) {
   console.log(`${signal} received. Shutting down gracefully...`);
   server.close(async () => {
