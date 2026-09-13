@@ -12,7 +12,7 @@ import {
 } from '../services/api'
 import EditMyDocumentModal from '../components/EditMyDocumentModal'
 
-const apiOrigin = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/api\/?$/, '')
+import { apiOrigin } from '../services/apiOrigin'
 
 export default function LibraryPage() {
   const [user, setUser] = useState(null)

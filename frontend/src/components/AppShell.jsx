@@ -91,12 +91,14 @@ function AppShell({ children }) {
             <button className="icon-button" title="Thông báo" type="button" aria-label="Thông báo">♢</button>
             {!accessToken && <Link className="header-login" to="/dang-nhap">Đăng nhập</Link>}
             <Link className="header-upload" to={uploadPath}>☁ Tải lên tài liệu</Link>
-            <div className="profile-menu">
+            {accessToken && <div className="profile-menu">
               <button className="avatar" onClick={() => setMenuOpen((current) => !current)} title="Tài khoản" type="button">
                 {(user?.fullName || 'A').slice(0, 1).toUpperCase()}
               </button>
               {menuOpen && (
                 <div className="profile-dropdown">
+                  {user?.role === 'ADMIN' && <Link onClick={() => setMenuOpen(false)} to="/admin">Quản trị hệ thống</Link>}
+                  {user?.role === 'MODERATOR' && <Link onClick={() => setMenuOpen(false)} to="/kiem-duyet">Bàn kiểm duyệt</Link>}
                   <strong>{user?.fullName || (accessToken ? 'Tài khoản của tôi' : 'Khách')}</strong>
                   {accessToken && (
                     <div className="mb-2 border-b border-slate-100 pb-2 text-xs text-slate-500">
@@ -115,7 +117,7 @@ function AppShell({ children }) {
                   )}
                 </div>
               )}
-            </div>
+            </div>}
           </div>
         </div>
       </header>

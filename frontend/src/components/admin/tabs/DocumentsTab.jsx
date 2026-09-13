@@ -8,6 +8,7 @@ export default function DocumentsTab({
   onModerateDocument,
   onDeleteDocument,
   onOpenEditModal,
+  canManageSystem = false,
 }) {
   const [docStatusFilter, setDocStatusFilter] = useState('ALL')
   const [docTypeFilter, setDocTypeFilter] = useState('ALL')
@@ -159,13 +160,13 @@ export default function DocumentsTab({
                   </td>
                   <td className="p-3 text-right whitespace-nowrap">
                     <div className="flex items-center justify-end gap-1.5">
-                      <button
+                      {canManageSystem && <button
                         onClick={() => onOpenEditModal(doc)}
                         className="rounded bg-[#f1f3ff] p-1.5 text-[#00288e] hover:bg-[#e1e8fd] transition"
                         title="Chỉnh sửa chi tiết tài liệu"
                       >
                         <span className="material-symbols-outlined text-[16px]">edit</span>
-                      </button>
+                      </button>}
                       {doc.status === 'PUBLISHED' ? (
                         <button
                           onClick={() => onModerateDocument(doc.id, 'REJECTED')}
@@ -183,13 +184,13 @@ export default function DocumentsTab({
                           <span className="material-symbols-outlined text-[16px]">check</span>
                         </button>
                       )}
-                      <button
+                      {canManageSystem && <button
                         onClick={() => onDeleteDocument(doc.id)}
                         className="rounded bg-slate-100 p-1.5 text-slate-600 hover:bg-red-100 hover:text-red-700 transition"
                         title="Xóa tài liệu (Soft delete)"
                       >
                         <span className="material-symbols-outlined text-[16px]">delete</span>
-                      </button>
+                      </button>}
                     </div>
                   </td>
                 </tr>

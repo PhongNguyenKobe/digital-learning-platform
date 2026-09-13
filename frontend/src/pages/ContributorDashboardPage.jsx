@@ -12,7 +12,7 @@ import {
 import { extractPdfCover } from '../utils/pdfThumbnail'
 import EditMyDocumentModal from '../components/EditMyDocumentModal'
 
-const apiOrigin = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/api\/?$/, '')
+import { apiOrigin } from '../services/apiOrigin'
 const currentAcademicYear = `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`
 const initialForm = { title: '', documentType: 'TEXTBOOK', universityId: '', universityQuery: '', facultyId: '', facultyQuery: '', subjectId: '', subjectQuery: '', academicYear: currentAcademicYear, visibility: 'PUBLIC', isLocked: false, description: '', tags: '' }
 

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-const apiOrigin = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/api\/?$/, '')
+import { apiOrigin } from '../services/apiOrigin'
 
 function DocumentCard({ document }) {
   const thumbSrc = document.thumbnailUrl

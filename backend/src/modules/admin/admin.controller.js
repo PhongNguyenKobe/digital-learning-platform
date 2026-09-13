@@ -6,7 +6,7 @@ const { purgeExpiredRecords } = require('../../services/purge.service');
 
 const documentStatuses = new Set(['PUBLISHED', 'REJECTED', 'ARCHIVED', 'PENDING_REVIEW']);
 const reportStatuses = new Set(['OPEN', 'IN_REVIEW', 'RESOLVED', 'DISMISSED']);
-const userRoles = new Set(['STUDENT', 'ADMIN']);
+const userRoles = new Set(['STUDENT', 'MODERATOR', 'ADMIN']);
 const userStatuses = new Set(['ACTIVE', 'SUSPENDED', 'DELETED']);
 const commentStatuses = new Set(['VISIBLE', 'HIDDEN', 'DELETED']);
 

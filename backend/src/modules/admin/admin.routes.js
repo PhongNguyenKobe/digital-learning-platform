@@ -4,58 +4,50 @@ const { authenticate, requireRoles } = require('../../middlewares/auth');
 
 const router = express.Router();
 const adminOnly = requireRoles('ADMIN');
+const moderationStaff = requireRoles('ADMIN', 'MODERATOR');
 
-router.use(authenticate, adminOnly);
+router.use(authenticate);
 
-// 1. Thống kê & Tổng quan
-router.get('/stats', controller.getStats);
+// Moderators can review documents, reports and comments. Every action is
+// recorded by the controller in AuditLog for administrators to inspect.
+router.get('/stats', moderationStaff, controller.getStats);
+router.get('/reports', moderationStaff, controller.listReports);
+router.patch('/reports/:id', moderationStaff, controller.updateReport);
+router.get('/flagged-documents', moderationStaff, controller.listFlaggedDocuments);
+router.get('/documents', moderationStaff, controller.listAllDocuments);
+router.patch('/documents/:id/status', moderationStaff, controller.updateDocumentStatus);
+router.patch('/comments/:id/status', moderationStaff, controller.updateCommentStatus);
 
-// 2. Báo cáo & Hàng đợi rủi ro (Risk Queue)
-router.get('/reports', controller.listReports);
-router.patch('/reports/:id', controller.updateReport);
-router.get('/flagged-documents', controller.listFlaggedDocuments);
+// System administration remains exclusively with ADMIN.
+router.patch('/documents/:id', adminOnly, controller.updateDocumentDetails);
+router.delete('/documents/:id', adminOnly, controller.softDeleteDocument);
+router.post('/documents/:id/restore', adminOnly, controller.restoreDocument);
 
-// 3. Quản lý Tài liệu (Toàn diện)
-router.get('/documents', controller.listAllDocuments);
-router.patch('/documents/:id', controller.updateDocumentDetails);
-router.patch('/documents/:id/status', controller.updateDocumentStatus);
-router.delete('/documents/:id', controller.softDeleteDocument);
-router.post('/documents/:id/restore', controller.restoreDocument);
+router.get('/users', adminOnly, controller.listUsers);
+router.post('/users', adminOnly, controller.createUser);
+router.patch('/users/:id', adminOnly, controller.updateUserDetails);
+router.patch('/users/:id/role', adminOnly, controller.updateUserRole);
+router.patch('/users/:id/status', adminOnly, controller.updateUserStatus);
+router.delete('/users/:id', adminOnly, controller.deleteUser);
 
-// 4. Bình luận
-router.patch('/comments/:id/status', controller.updateCommentStatus);
+router.get('/catalog/universities', adminOnly, controller.listUniversitiesAdmin);
+router.post('/catalog/universities', adminOnly, controller.createUniversity);
+router.patch('/catalog/universities/:id', adminOnly, controller.updateUniversity);
+router.delete('/catalog/universities/:id', adminOnly, controller.deleteUniversity);
+router.get('/catalog/faculties', adminOnly, controller.listFacultiesAdmin);
+router.post('/catalog/faculties', adminOnly, controller.createFaculty);
+router.patch('/catalog/faculties/:id', adminOnly, controller.updateFaculty);
+router.delete('/catalog/faculties/:id', adminOnly, controller.deleteFaculty);
+router.get('/catalog/subjects', adminOnly, controller.listSubjectsAdmin);
+router.post('/catalog/subjects', adminOnly, controller.createSubject);
+router.patch('/catalog/subjects/:id', adminOnly, controller.updateSubject);
+router.delete('/catalog/subjects/:id', adminOnly, controller.deleteSubject);
+router.get('/catalog/categories', adminOnly, controller.listCategoriesAdmin);
+router.post('/catalog/categories', adminOnly, controller.createCategory);
+router.patch('/catalog/categories/:id', adminOnly, controller.updateCategory);
+router.delete('/catalog/categories/:id', adminOnly, controller.deleteCategory);
 
-// 5. Quản lý Người dùng
-router.get('/users', controller.listUsers);
-router.post('/users', controller.createUser);
-router.patch('/users/:id', controller.updateUserDetails);
-router.patch('/users/:id/role', controller.updateUserRole);
-router.patch('/users/:id/status', controller.updateUserStatus);
-router.delete('/users/:id', controller.deleteUser);
-
-// 6. Quản lý Danh mục & Đơn vị đào tạo (Catalogs)
-router.get('/catalog/universities', controller.listUniversitiesAdmin);
-router.post('/catalog/universities', controller.createUniversity);
-router.patch('/catalog/universities/:id', controller.updateUniversity);
-router.delete('/catalog/universities/:id', controller.deleteUniversity);
-
-router.get('/catalog/faculties', controller.listFacultiesAdmin);
-router.post('/catalog/faculties', controller.createFaculty);
-router.patch('/catalog/faculties/:id', controller.updateFaculty);
-router.delete('/catalog/faculties/:id', controller.deleteFaculty);
-
-router.get('/catalog/subjects', controller.listSubjectsAdmin);
-router.post('/catalog/subjects', controller.createSubject);
-router.patch('/catalog/subjects/:id', controller.updateSubject);
-router.delete('/catalog/subjects/:id', controller.deleteSubject);
-
-router.get('/catalog/categories', controller.listCategoriesAdmin);
-router.post('/catalog/categories', controller.createCategory);
-router.patch('/catalog/categories/:id', controller.updateCategory);
-router.delete('/catalog/categories/:id', controller.deleteCategory);
-
-// 7. Nhật ký thanh tra & Bảo trì
-router.get('/audit-logs', controller.listAuditLogs);
-router.post('/purge-deleted', controller.triggerPurgeDeleted);
+router.get('/audit-logs', adminOnly, controller.listAuditLogs);
+router.post('/purge-deleted', adminOnly, controller.triggerPurgeDeleted);
 
 module.exports = router;

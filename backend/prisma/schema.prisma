@@ -9,6 +9,7 @@ datasource db {
 
 enum UserRole {
   STUDENT
+  MODERATOR
   ADMIN
 }
 
@@ -575,4 +576,3 @@ model DocumentUnlock {
   @@index([documentId])
   @@map("document_unlocks")
 }
-

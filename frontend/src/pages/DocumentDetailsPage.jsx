@@ -11,7 +11,7 @@ import {
 } from '../services/api'
 import PremiumModal from '../components/PremiumModal'
 
-const apiOrigin = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/api\/?$/, '')
+import { apiOrigin } from '../services/apiOrigin'
 
 function DocumentDetailsPage() {
   const { id } = useParams()

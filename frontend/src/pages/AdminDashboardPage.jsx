@@ -8,7 +8,6 @@ import {
   updateAdminDocumentDetails,
   updateDocumentStatus,
   deleteAdminDocument,
-  restoreAdminDocument,
   fetchAdminUsers,
   createAdminUser,
   updateAdminUserDetails,
@@ -65,6 +64,7 @@ export default function AdminDashboardPage() {
 
   // Admin Profile & Loading State
   const [currentUser, setCurrentUser] = useState(null)
+  const canManageSystem = currentUser?.role === 'ADMIN'
   const [purging, setPurging] = useState(false)
 
   // Core Data States
@@ -105,7 +105,10 @@ export default function AdminDashboardPage() {
           fetchAdminReports({ limit: 50 }).catch(() => null),
         ])
         if (!cancelled) {
-          if (meRes?.data) setCurrentUser(meRes.data)
+          if (meRes?.data) {
+            setCurrentUser(meRes.data)
+            if (meRes.data.role === 'MODERATOR') setActiveTab('risk_queue')
+          }
           if (statsRes?.data) setStats(statsRes.data)
           if (repRes?.data) setReports(repRes.data)
         }
@@ -374,6 +377,7 @@ export default function AdminDashboardPage() {
           reportsCount={reports.length}
           currentUser={currentUser}
           onLogout={handleLogout}
+          canManageSystem={canManageSystem}
         />
 
         {/* Right Content Workspace Area */}
@@ -422,6 +426,7 @@ export default function AdminDashboardPage() {
               onModerateDocument={handleModerateDocument}
               onDeleteDocument={handleDeleteDocument}
               onOpenEditModal={(doc) => setModalState({ type: 'edit_doc', data: doc })}
+              canManageSystem={canManageSystem}
             />
           )}
 
