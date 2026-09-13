@@ -6,6 +6,7 @@ import {
   fetchCurrentUser,
   fetchDocument,
   rateDocument,
+  reportDocument,
   toggleFavorite,
   unlockDocument,
 } from '../services/api'
@@ -28,6 +29,10 @@ function DocumentDetailsPage() {
   const [error, setError] = useState('')
   const [currentUser, setCurrentUser] = useState(null)
   const [premiumModalOpen, setPremiumModalOpen] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
+  const [reportReason, setReportReason] = useState('INCORRECT_INFORMATION')
+  const [reportDescription, setReportDescription] = useState('')
+  const [reporting, setReporting] = useState(false)
 
   const token = localStorage.getItem('hls_access_token')
 
@@ -95,6 +100,25 @@ function DocumentDetailsPage() {
       setNotice(favorite ? 'Đã bỏ khỏi thư viện.' : 'Đã lưu vào thư viện của tôi.')
     } catch (requestError) {
       setNotice(requestError.response?.data?.error?.message || 'Bạn cần đăng nhập để lưu tài liệu.')
+    }
+  }
+
+  async function submitReport(event) {
+    event.preventDefault()
+    if (!token) {
+      navigate(`/dang-nhap?redirect=/tai-lieu/${id}`)
+      return
+    }
+    setReporting(true)
+    try {
+      await reportDocument(id, { reason: reportReason, description: reportDescription.trim() })
+      setReportOpen(false)
+      setReportDescription('')
+      setNotice('Báo cáo đã được gửi đến hàng đợi kiểm duyệt. Cảm ơn bạn đã góp phần giữ kho học liệu an toàn.')
+    } catch (requestError) {
+      setNotice(requestError.response?.data?.error?.message || 'Không thể gửi báo cáo. Vui lòng thử lại.')
+    } finally {
+      setReporting(false)
     }
   }
 
@@ -514,6 +538,13 @@ function DocumentDetailsPage() {
                 Gửi đánh giá
               </button>
             </div>
+            <div className="rounded-xl border border-rose-100 bg-rose-50/40 p-5 shadow-sm">
+              <h2 className="text-sm font-bold text-slate-900">Phát hiện vấn đề?</h2>
+              <p className="mt-1 text-xs leading-5 text-slate-600">Báo cáo vi phạm bản quyền, nội dung sai hoặc tệp lỗi để kiểm duyệt viên xử lý.</p>
+              <button className="mt-3 w-full cursor-pointer rounded-lg border border-rose-200 bg-white px-4 py-2.5 text-sm font-bold text-rose-700 transition hover:bg-rose-100" onClick={() => setReportOpen(true)} type="button">
+                Báo cáo tài liệu
+              </button>
+            </div>
             {notice && <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800">{notice}</div>}
           </aside>
         </div>
@@ -525,6 +556,35 @@ function DocumentDetailsPage() {
         onSuccess={handlePremiumSuccess}
         userCredits={currentUser?.downloadCredits ?? 0}
       />
+
+      {reportOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+          <form className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl" onSubmit={submitReport}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">Báo cáo tài liệu</h2>
+                <p className="mt-1 text-xs leading-5 text-slate-500">Báo cáo sẽ được gửi riêng đến kiểm duyệt viên.</p>
+              </div>
+              <button className="cursor-pointer rounded-md p-1 text-xl text-slate-400 hover:bg-slate-100" onClick={() => setReportOpen(false)} type="button" aria-label="Đóng">×</button>
+            </div>
+            <label className="mt-5 block text-sm font-semibold text-slate-700">Lý do</label>
+            <select className="mt-1 w-full cursor-pointer rounded-lg border border-slate-200 bg-white p-3 text-sm outline-none focus:ring-2 focus:ring-blue-600" value={reportReason} onChange={(event) => setReportReason(event.target.value)}>
+              <option value="COPYRIGHT">Vi phạm bản quyền</option>
+              <option value="INAPPROPRIATE">Nội dung không phù hợp</option>
+              <option value="INCORRECT_INFORMATION">Thông tin không chính xác</option>
+              <option value="SPAM">Spam / quảng cáo</option>
+              <option value="BROKEN_FILE">Tệp hỏng hoặc không tải được</option>
+              <option value="OTHER">Lý do khác</option>
+            </select>
+            <label className="mt-4 block text-sm font-semibold text-slate-700">Mô tả <span className="font-normal text-slate-400">(không bắt buộc)</span></label>
+            <textarea className="mt-1 min-h-28 w-full resize-y rounded-lg border border-slate-200 p-3 text-sm outline-none focus:ring-2 focus:ring-blue-600" maxLength="5000" value={reportDescription} onChange={(event) => setReportDescription(event.target.value)} placeholder="Nêu rõ vị trí, lý do hoặc thông tin giúp kiểm duyệt viên xác minh..." />
+            <div className="mt-5 flex justify-end gap-3">
+              <button className="cursor-pointer rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100" onClick={() => setReportOpen(false)} type="button">Hủy</button>
+              <button className="cursor-pointer rounded-lg bg-rose-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-rose-800 disabled:cursor-wait disabled:opacity-60" disabled={reporting} type="submit">{reporting ? 'Đang gửi...' : 'Gửi báo cáo'}</button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   )
 }

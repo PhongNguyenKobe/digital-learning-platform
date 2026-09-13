@@ -48,14 +48,14 @@ export default function RiskQueueTab({
             Nội dung không phù hợp ({reports.filter((r) => r.reason === 'INAPPROPRIATE').length})
           </button>
           <button
-            onClick={() => setReportFilter('PRIVACY')}
+            onClick={() => setReportFilter('BROKEN_FILE')}
             className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
-              reportFilter === 'PRIVACY'
+              reportFilter === 'BROKEN_FILE'
                 ? 'bg-[#00288e] text-white shadow-sm'
                 : 'bg-[#f1f3ff] text-[#141b2b] hover:bg-[#e1e8fd]'
             }`}
           >
-            Quyền riêng tư ({reports.filter((r) => r.reason === 'PRIVACY').length})
+            Tệp lỗi ({reports.filter((r) => r.reason === 'BROKEN_FILE').length})
           </button>
         </div>
       </div>

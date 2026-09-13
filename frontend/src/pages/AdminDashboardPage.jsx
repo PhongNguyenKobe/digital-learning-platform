@@ -389,7 +389,6 @@ export default function AdminDashboardPage() {
           <AdminMetrics
             stats={stats}
             pendingRiskCount={reports.length || stats.pendingRisk}
-            pendingReportsCount={reports.filter((r) => r.status === 'PENDING').length}
           />
 
           {/* Tab Content Switching */}

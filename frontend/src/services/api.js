@@ -122,6 +122,11 @@ export async function toggleFavorite(id, shouldFavorite) {
   return response.data
 }
 
+export async function reportDocument(id, data) {
+  const response = await api.post(`/documents/${id}/reports`, data)
+  return response.data
+}
+
 // ==========================================
 // --- ADMIN MANAGEMENT & MODERATION APIS ---
 // ==========================================

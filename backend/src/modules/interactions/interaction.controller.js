@@ -194,6 +194,17 @@ async function createReport(req, res, target) {
   if (target === 'document') {
     await getDocument(req.params.id);
     data.documentId = req.params.id;
+    const existingReport = await prisma.report.findFirst({
+      where: {
+        reporterId: req.user.id,
+        documentId: req.params.id,
+        status: { in: ['OPEN', 'IN_REVIEW'] },
+      },
+      select: { id: true },
+    });
+    if (existingReport) {
+      throw httpError(409, 'Báº¡n Ä‘Ã£ gá»­i báº¡o cÃ¡o cho tÃ i liá»‡u nÃ y. Kiá»ƒm duyá»‡t viÃªn Ä‘ang xá»­ lÃ½.');
+    }
   } else {
     const comment = await prisma.comment.findUnique({ where: { id: req.params.id }, select: { id: true } });
     if (!comment) throw httpError(404, 'Không tìm thấy bình luận.');

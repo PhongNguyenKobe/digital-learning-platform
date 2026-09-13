@@ -64,8 +64,8 @@ export default function AdminHeader({ activeTab }) {
           <span className="relative inline-flex h-3 w-3 rounded-full bg-[#00563a]" />
         </span>
         <div className="flex flex-col">
-          <span className="text-xs font-bold text-[#141b2b]">Cơ chế Xuất bản Lạc quan: ĐANG BẬT</span>
-          <span className="text-[11px] text-[#444653]">Tài liệu lập tức khả dụng • AI lọc rủi ro 24/7</span>
+          <span className="text-xs font-bold text-[#141b2b]">Chế độ Đăng tải Tức thì: BẬT</span>
+          <span className="text-[11px] text-[#444653]">Xuất bản ngay lập tức • Hệ thống AI tự động kiểm duyệt 24/7</span>
         </div>
       </div>
     </div>
