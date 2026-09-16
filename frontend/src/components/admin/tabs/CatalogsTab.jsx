@@ -67,7 +67,9 @@ export default function CatalogsTab({
                       {u.code || u.slug}
                     </span>
                   </td>
-                  <td className="p-3 text-[#444653]">{u.faculties?.length || 0} khoa trực thuộc</td>
+                  <td className="p-3 text-[#444653]">
+                    {u._count?.faculties ?? faculties.filter((faculty) => faculty.universityId === u.id).length} khoa trực thuộc
+                  </td>
                   <td className="p-3 text-right">
                     <div className="flex items-center justify-end gap-1.5">
                       <button
