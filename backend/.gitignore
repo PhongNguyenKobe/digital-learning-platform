@@ -2,3 +2,6 @@
 .env
 .env.local
 .env.production
+
+# Runtime uploads, generated document previews and thumbnails are local storage.
+uploads/

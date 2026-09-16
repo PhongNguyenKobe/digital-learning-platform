@@ -9,7 +9,8 @@ const { processDocumentJob } = require('../../services/documentProcessing.servic
 const { watermarkThumbnail } = require('../../services/thumbnailWatermark.service');
 const { watermarkPdf } = require('../../services/pdfWatermark.service');
 const { createPdfCover } = require('../../services/pdfPreview.service');
-const { thumbnailDirectory } = require('../../middlewares/upload');
+const { canCreateOfficePreview, ensureOfficePdfPreview } = require('../../services/officePreview.service');
+const { thumbnailDirectory, previewDirectory } = require('../../middlewares/upload');
 
 const validDocumentTypes = new Set(['TEXTBOOK', 'EXAM', 'LECTURE_NOTE', 'SUMMARY', 'THESIS', 'RESEARCH_PAPER', 'ASSIGNMENT', 'OTHER']);
 const validSortFields = new Set(['downloadCount', 'ratingAverage', 'createdAt', 'title']);
@@ -46,6 +47,17 @@ function parseOptionalJson(value, fieldName) {
 
 function serialize(value) {
   return JSON.parse(JSON.stringify(value, (_, item) => (typeof item === 'bigint' ? item.toString() : item)));
+}
+
+function sendOfficePreviewUnavailable(res) {
+  return res.status(503).set({ 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }).type('html').send(`<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><title>Chưa thể xem trước</title></head>
+<body style="margin:0;font-family:Arial,sans-serif;background:#f8fafc;color:#334155;display:grid;min-height:100vh;place-items:center;padding:24px;box-sizing:border-box">
+  <main style="max-width:480px;text-align:center;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px;box-shadow:0 8px 24px rgba(15,23,42,.08)">
+    <h1 style="margin:0 0 12px;color:#00288e;font-size:20px">Chưa thể tạo bản xem trước</h1>
+    <p style="margin:0;line-height:1.6">Máy chủ chưa có LibreOffice để chuyển đổi DOCX/PPTX sang PDF. Bạn vẫn có thể tải file gốc về để xem.</p>
+  </main>
+</body></html>`);
 }
 
 async function uniqueSlug(title) {
@@ -347,12 +359,60 @@ const streamDocumentContent = asyncHandler(async (req, res) => {
   return res.sendFile(filePath);
 });
 
+const streamOfficePreviewContent = asyncHandler(async (req, res) => {
+  const document = await prisma.document.findFirst({
+    where: { id: req.params.id, deletedAt: null, status: 'PUBLISHED', visibility: 'PUBLIC' },
+    select: { id: true, fileUrl: true, originalFileName: true, fileFormat: true, isLocked: true, uploaderId: true },
+  });
+  if (!document) throw httpError(404, 'Không tìm thấy tài liệu công khai.');
+  if (!canCreateOfficePreview(document.fileFormat)) throw httpError(415, 'Định dạng này chưa hỗ trợ xem trước trực tuyến.');
+
+  let canView = !document.isLocked;
+  if (document.isLocked && req.user) {
+    const isOwnerOrAdmin = req.user.role === 'ADMIN' || req.user.id === document.uploaderId;
+    const hasPremium = req.user.isPremium && (!req.user.premiumExpiresAt || new Date(req.user.premiumExpiresAt) > new Date());
+    const unlock = !isOwnerOrAdmin && !hasPremium
+      ? await prisma.documentUnlock.findUnique({ where: { userId_documentId: { userId: req.user.id, documentId: document.id } } })
+      : true;
+    canView = Boolean(isOwnerOrAdmin || hasPremium || unlock);
+  }
+  if (!canView) throw httpError(403, 'Tài liệu này cần được mở khóa trước khi đọc toàn bộ.');
+
+  const sourcePath = path.resolve(process.cwd(), env.uploadDir, path.basename(document.fileUrl));
+  try { await fs.access(sourcePath); } catch { throw httpError(404, 'File tài liệu chưa tồn tại trên storage.'); }
+
+  let previewPath;
+  try {
+    previewPath = await ensureOfficePdfPreview({ documentId: document.id, fileFormat: document.fileFormat, sourcePath, previewDirectory });
+  } catch (error) {
+    console.error('[Office preview] Conversion failed:', error.message);
+    return sendOfficePreviewUnavailable(res);
+  }
+  res.set({
+    'Content-Type': 'application/pdf',
+    'Content-Disposition': `inline; filename*=UTF-8''${encodeURIComponent(`${path.parse(document.originalFileName).name}.pdf`)}`,
+    'X-Content-Type-Options': 'nosniff',
+    'Cache-Control': document.isLocked ? 'private, no-store' : 'private, max-age=300',
+  });
+  return res.sendFile(previewPath);
+});
+
 const previewDocument = asyncHandler(async (req, res) => {
   const document = await prisma.document.findFirst({ where: { id: req.params.id, deletedAt: null, status: 'PUBLISHED', visibility: 'PUBLIC' }, select: { id: true, title: true, fileUrl: true, fileFormat: true, thumbnailUrl: true } });
   if (!document) throw httpError(404, 'Không tìm thấy tài liệu công khai.');
   let thumbnailUrl = document.thumbnailUrl;
-  if (!thumbnailUrl && document.fileFormat === 'PDF') {
-    const cover = await createPdfCover(path.resolve(process.cwd(), env.uploadDir, path.basename(document.fileUrl)), thumbnailDirectory);
+  if (!thumbnailUrl && (document.fileFormat === 'PDF' || canCreateOfficePreview(document.fileFormat))) {
+    const sourcePath = path.resolve(process.cwd(), env.uploadDir, path.basename(document.fileUrl));
+    let previewSourcePath = sourcePath;
+    if (canCreateOfficePreview(document.fileFormat)) {
+      try {
+        previewSourcePath = await ensureOfficePdfPreview({ documentId: document.id, fileFormat: document.fileFormat, sourcePath, previewDirectory });
+      } catch (error) {
+        console.error('[Office preview] Cover conversion failed:', error.message);
+        return sendOfficePreviewUnavailable(res);
+      }
+    }
+    const cover = await createPdfCover(previewSourcePath, thumbnailDirectory);
     if (cover) {
       const watermarked = await watermarkThumbnail(cover, document.title);
       thumbnailUrl = `/uploads/thumbnails/${watermarked.filename}`;
@@ -626,6 +686,7 @@ module.exports = {
   listDocuments,
   getDocument,
   streamDocumentContent,
+  streamOfficePreviewContent,
   previewDocument,
   unlockDocument,
   listMyDocuments,

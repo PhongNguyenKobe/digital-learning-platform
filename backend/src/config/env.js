@@ -25,6 +25,7 @@ module.exports = {
   allowNgrokOrigins: process.env.ALLOW_NGROK_ORIGINS === 'true',
   pdfTextCommand: process.env.PDF_TEXT_COMMAND || 'pdftotext',
   pdfImageCommand: process.env.PDF_IMAGE_COMMAND || 'pdftoppm',
+  officeConverterCommand: process.env.OFFICE_CONVERTER_COMMAND || 'soffice',
   clamAvCommand: process.env.CLAMAV_COMMAND || 'clamscan',
   documentWorkerIntervalMs: Number(process.env.DOCUMENT_WORKER_INTERVAL_MS || 15000),
   frontendUrl: (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, ''),

@@ -16,6 +16,7 @@ router.get('/mine/favorites', authenticate, controller.listMyFavorites);
 router.get('/mine/downloads', authenticate, controller.listMyDownloads);
 router.get('/:id/preview', controller.previewDocument);
 router.get('/:id/content', optionalAuthenticate, controller.streamDocumentContent);
+router.get('/:id/preview-content', optionalAuthenticate, controller.streamOfficePreviewContent);
 router.get('/:id', optionalAuthenticate, controller.getDocument);
 router.post('/:id/unlock', authLimiter, authenticate, controller.unlockDocument);
 router.post(

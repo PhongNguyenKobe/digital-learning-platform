@@ -38,8 +38,10 @@ async function validateFileSignature(file, isThumbnail = false) {
 
 const uploadDirectory = path.resolve(process.cwd(), env.uploadDir || 'uploads');
 const thumbnailDirectory = path.join(uploadDirectory, 'thumbnails');
+const previewDirectory = path.join(uploadDirectory, 'previews');
 fs.mkdirSync(uploadDirectory, { recursive: true });
 fs.mkdirSync(thumbnailDirectory, { recursive: true });
+fs.mkdirSync(previewDirectory, { recursive: true });
 
 const allowedDocumentTypes = new Set([
   'application/pdf',
@@ -120,4 +122,5 @@ module.exports = {
   uploadDocument,
   uploadDirectory,
   thumbnailDirectory,
+  previewDirectory,
 };
