@@ -760,6 +760,20 @@ export default function LibraryPage() {
                     {user?.role === 'ADMIN' ? 'Quản trị viên' : 'Sinh viên'}
                   </span>
                 </div>
+                <div className="flex justify-between border-b border-slate-100 pb-2">
+                  <span className="text-[#757684]">Gói Premium:</span>
+                  {user?.isPremium && (!user?.premiumExpiresAt || new Date(user.premiumExpiresAt) > new Date()) ? (
+                    <strong className="text-[#00563a]">Đang sử dụng</strong>
+                  ) : (
+                    <strong className="text-[#757684]">Chưa đăng ký</strong>
+                  )}
+                </div>
+                {user?.isPremium && user?.premiumExpiresAt && new Date(user.premiumExpiresAt) > new Date() && (
+                  <div className="flex justify-between border-b border-slate-100 pb-2">
+                    <span className="text-[#757684]">Hiệu lực đến:</span>
+                    <strong className="text-[#00563a]">{new Date(user.premiumExpiresAt).toLocaleDateString('vi-VN')}</strong>
+                  </div>
+                )}
               </div>
             </div>
 

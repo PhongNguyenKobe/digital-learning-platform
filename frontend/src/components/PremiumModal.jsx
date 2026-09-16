@@ -32,7 +32,7 @@ const plans = [
   },
 ]
 
-function PremiumModal({ isOpen, onClose }) {
+function PremiumModal({ isOpen, onClose, user }) {
   const [selectedPlan, setSelectedPlan] = useState('SEMESTER')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -54,6 +54,11 @@ function PremiumModal({ isOpen, onClose }) {
   }
 
   const activePlanObj = plans.find((p) => p.id === selectedPlan)
+  const expiresAt = user?.premiumExpiresAt ? new Date(user.premiumExpiresAt) : null
+  const hasActivePremium = Boolean(user?.isPremium && (!expiresAt || expiresAt > new Date()))
+  const expiryLabel = expiresAt && !Number.isNaN(expiresAt.getTime())
+    ? expiresAt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    : 'chưa xác định'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-fadeIn">
@@ -73,9 +78,9 @@ function PremiumModal({ isOpen, onClose }) {
             </span>
             <span className="text-xs text-blue-200">Học liệu số Pass</span>
           </div>
-          <h2 className="mt-2 text-2xl font-black tracking-tight">Nâng cấp Đặc quyền Không giới hạn</h2>
+          <h2 className="mt-2 text-2xl font-black tracking-tight">{hasActivePremium ? 'Gói Premium của bạn đang hoạt động' : 'Nâng cấp Đặc quyền Không giới hạn'}</h2>
           <p className="mt-1 text-sm text-blue-100">
-            Tải và xem tất cả tài liệu bị khóa, đề thi độc quyền mà không cần phải chờ đóng góp tài liệu.
+            {hasActivePremium ? `Bạn đang sử dụng Học liệu số Pass, có hiệu lực đến ${expiryLabel}.` : 'Tải và xem tất cả tài liệu bị khóa, đề thi độc quyền mà không cần phải chờ đóng góp tài liệu.'}
           </p>
         </div>
 
@@ -96,7 +101,12 @@ function PremiumModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          {/* Chọn gói */}
+          {hasActivePremium ? (
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-center">
+              <div className="text-sm font-black text-emerald-800">✓ Bạn đang sử dụng gói Premium</div>
+              <p className="mt-2 text-xs leading-5 text-emerald-700">Quyền xem và tải học liệu không giới hạn đang được kích hoạt đến <strong>{expiryLabel}</strong>.</p>
+            </div>
+          ) : (
           <div className="grid gap-3 sm:grid-cols-3">
             {plans.map((p) => {
               const isSelected = selectedPlan === p.id
@@ -134,12 +144,13 @@ function PremiumModal({ isOpen, onClose }) {
               )
             })}
           </div>
+          )}
 
-          {error && <div className="mt-4 rounded-lg bg-rose-50 p-3 text-xs text-rose-700">{error}</div>}
+          {!hasActivePremium && error && <div className="mt-4 rounded-lg bg-rose-50 p-3 text-xs text-rose-700">{error}</div>}
 
           {/* Action buttons */}
           <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-xs text-slate-500">Bạn sẽ được chuyển đến cổng thanh toán VNPay Sandbox.</span>
+            <span className="text-xs text-slate-500">{hasActivePremium ? 'Cảm ơn bạn đã đồng hành cùng Học liệu số.' : 'Bạn sẽ được chuyển đến cổng thanh toán VNPay Sandbox.'}</span>
             <div className="flex gap-2">
               <button
                 className="rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
@@ -148,14 +159,14 @@ function PremiumModal({ isOpen, onClose }) {
               >
                 Đóng
               </button>
-              <button
+              {!hasActivePremium && <button
                 className="flex items-center justify-center gap-1.5 rounded-lg bg-[#00288e] px-6 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-[#002070] disabled:opacity-50"
                 disabled={loading}
                 onClick={handlePayment}
                 type="button"
               >
                 {loading ? 'Đang chuyển đến VNPay...' : `Thanh toán VNPay (${activePlanObj?.price}đ)`}
-              </button>
+              </button>}
             </div>
           </div>
         </div>

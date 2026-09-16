@@ -152,7 +152,7 @@ function ContributorDashboardPage() {
   }
 
   return <div className="min-h-screen bg-[#f9f9ff]"><div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-8 lg:px-6 lg:py-10">
-    <section><div className="flex flex-col justify-between gap-5 md:flex-row md:items-center"><div><div className="flex items-center gap-2"><span className="rounded-full bg-[#dde1ff] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#00288e]">Bảng quản trị tác giả</span><span className="text-[#c4c5d5]">/</span><span className="text-xs text-[#444653]">Học kỳ 2 - 2024-2025</span></div><h1 className="mt-3 text-3xl font-bold tracking-tight text-[#141b2b]">Quản lý tài liệu đã tải lên</h1><p className="mt-2 text-sm text-[#444653]">Theo dõi lượt xem, tải xuống, chỉ số trích dẫn và trạng thái phân loại tự động qua AI.</p></div>
+    <section><div className="flex flex-col justify-between gap-5 md:flex-row md:items-center"><div><div className="flex items-center gap-2"><span className="rounded-full bg-[#dde1ff] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#00288e]">Bảng quản trị tác giả</span><span className="text-[#c4c5d5]">/</span><span className="text-xs text-[#444653]">Đóng góp 1 lần đăng tải sẽ được +2 lượt tải miễn phí</span></div><h1 className="mt-3 text-3xl font-bold tracking-tight text-[#141b2b]">Quản lý tài liệu đã tải lên</h1><p className="mt-2 text-sm text-[#444653]">Theo dõi lượt xem, tải xuống, chỉ số trích dẫn và trạng thái phân loại tự động qua AI.</p></div>
       <a
         className="rounded-lg bg-[#00288e] px-5 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-[#1e40af]"
         href="#upload"

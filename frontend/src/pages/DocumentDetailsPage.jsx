@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   createComment,
@@ -64,6 +64,13 @@ function DocumentDetailsPage() {
     const params = document.isLocked && token ? `?previewToken=${encodeURIComponent(token)}` : ''
     return `${apiOrigin}/api/documents/${id}/content${params}`
   }, [document, id, token])
+
+  const onlinePreviewUrl = useMemo(() => {
+    if (!document) return ''
+    if (document.fileFormat === 'PDF') return fileUrl
+    const params = document.isLocked && token ? `?previewToken=${encodeURIComponent(token)}` : ''
+    return `${apiOrigin}/api/documents/${id}/preview-content${params}`
+  }, [document, fileUrl, id, token])
 
   async function submitComment(event) {
     event.preventDefault()
@@ -411,8 +418,8 @@ function DocumentDetailsPage() {
               ) : (
                 /* CHẾ ĐỘ ĐỌC TRỌN VẸN CHO TÀI LIỆU MIỄN PHÍ HOẶC ĐÃ MỞ KHÓA */
                 <div className="relative min-h-150 overflow-hidden rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-                  {fileUrl && document.fileFormat === 'PDF' ? (
-                    <iframe className="h-190 w-full rounded-lg" src={fileUrl} title={document.title} />
+                  {onlinePreviewUrl && ['PDF', 'DOC', 'DOCX', 'PPT', 'PPTX'].includes(document.fileFormat) ? (
+                    <iframe className="h-190 w-full rounded-lg" src={onlinePreviewUrl} title={document.title} />
                   ) : (
                     <div className="flex h-150 flex-col items-center justify-center text-center">
                       <div className="mb-4 text-7xl text-blue-200">▤</div>
@@ -555,6 +562,7 @@ function DocumentDetailsPage() {
         onClose={() => setPremiumModalOpen(false)}
         onSuccess={handlePremiumSuccess}
         userCredits={currentUser?.downloadCredits ?? 0}
+        user={currentUser}
       />
 
       {reportOpen && (
@@ -590,72 +598,20 @@ function DocumentDetailsPage() {
 }
 
 function PageOnePreview({ apiOrigin, thumbnailUrl, fileUrl, title }) {
-  const canvasRef = useRef(null)
   const thumbnailSrc = thumbnailUrl
     ? (thumbnailUrl.startsWith('http') ? thumbnailUrl : `${apiOrigin}${thumbnailUrl}`)
     : ''
-  const [thumbnailAvailable, setThumbnailAvailable] = useState(Boolean(thumbnailSrc))
-  const [loadingPdf, setLoadingPdf] = useState(!thumbnailSrc && Boolean(fileUrl))
-  const [hasRendered, setHasRendered] = useState(false)
+  const [previewAvailable, setPreviewAvailable] = useState(Boolean(thumbnailSrc || fileUrl))
+  const imageSrc = thumbnailSrc || fileUrl
 
-  useEffect(() => {
-    if (thumbnailAvailable || !fileUrl) return
-
-    let cancelled = false
-    async function renderPage1() {
-      try {
-        setLoadingPdf(true)
-        const pdfjsLib = await import('pdfjs-dist')
-        try {
-          pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-            'pdfjs-dist/build/pdf.worker.min.mjs',
-            import.meta.url
-          ).toString()
-        } catch {
-          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version || '4.0.379'}/build/pdf.worker.min.mjs`
-        }
-
-        const loadingTask = pdfjsLib.getDocument({ url: fileUrl })
-        const pdfDoc = await loadingTask.promise
-        const page = await pdfDoc.getPage(1)
-        if (cancelled) return
-
-        const canvas = canvasRef.current
-        if (!canvas) return
-        const context = canvas.getContext('2d')
-        const defaultViewport = page.getViewport({ scale: 1.0 })
-        const targetWidth = Math.min(800, window.innerWidth - 64)
-        const scale = Math.max(1.0, Math.min(2.0, targetWidth / defaultViewport.width))
-        const viewport = page.getViewport({ scale })
-
-        canvas.width = Math.floor(viewport.width)
-        canvas.height = Math.floor(viewport.height)
-
-        await page.render({ canvasContext: context, viewport }).promise
-        if (!cancelled) {
-          setHasRendered(true)
-          setLoadingPdf(false)
-        }
-      } catch (err) {
-        console.warn('Lỗi khi render trang 1 bằng PDF.js:', err)
-        if (!cancelled) setLoadingPdf(false)
-      }
-    }
-
-    renderPage1()
-    return () => {
-      cancelled = true
-    }
-  }, [fileUrl, thumbnailAvailable])
-
-  if (thumbnailAvailable) {
+  if (previewAvailable && imageSrc) {
     return (
       <div className="flex justify-center bg-slate-100 p-2 sm:p-4">
         <img
-          src={thumbnailSrc}
+          src={imageSrc}
           alt={title || 'Trang 1 xem thử'}
           className="w-full max-w-2xl h-auto rounded-lg shadow-md border border-slate-200 object-contain block bg-white"
-          onError={() => setThumbnailAvailable(false)}
+          onError={() => setPreviewAvailable(false)}
         />
       </div>
     )
@@ -663,24 +619,7 @@ function PageOnePreview({ apiOrigin, thumbnailUrl, fileUrl, title }) {
 
   return (
     <div className="relative flex min-h-120 w-full flex-col items-center justify-center bg-slate-100 p-2 sm:p-4">
-      {loadingPdf && (
-        <div className="flex flex-col items-center gap-2 py-16 text-slate-500 text-xs">
-          <span className="h-5 w-5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-          <span>Đang tải trang 1 xem thử...</span>
-        </div>
-      )}
-      <div className={`w-full max-w-2xl rounded-lg shadow-md border border-slate-200 overflow-hidden bg-white ${hasRendered ? 'block' : 'hidden'}`}>
-        <canvas ref={canvasRef} className="w-full h-auto block" />
-      </div>
-      {!hasRendered && !loadingPdf && (
-        <div className="w-full max-w-2xl h-150 rounded-lg shadow-md border border-slate-200 overflow-hidden bg-white">
-          <iframe
-            className="w-full h-full pointer-events-none"
-            src={`${fileUrl}#page=1&view=FitH&toolbar=0&navpanes=0`}
-            title="Trang 1 xem thử"
-          />
-        </div>
-      )}
+      <div className="text-center text-sm text-slate-500">Chưa thể tải trang xem thử của tài liệu này.</div>
     </div>
   )
 }

@@ -34,6 +34,7 @@ function AppShell({ children }) {
   }, [accessToken])
 
   const uploadPath = accessToken ? '/dong-gop' : '/dang-nhap'
+  const hasActivePremium = Boolean(user?.isPremium && (!user?.premiumExpiresAt || new Date(user.premiumExpiresAt) > new Date()))
 
   function logout() {
     localStorage.removeItem('hls_access_token')
@@ -70,7 +71,7 @@ function AppShell({ children }) {
             {accessToken && (
               <button
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold transition shadow-xs ${
-                  user?.isPremium
+                  hasActivePremium
                     ? 'border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100'
                     : 'border border-blue-200 bg-blue-50 text-[#00288e] hover:bg-blue-100'
                 }`}
@@ -78,7 +79,7 @@ function AppShell({ children }) {
                 title="Quản lý lượt tải & Gói VIP Premium"
                 type="button"
               >
-                {user?.isPremium ? (
+                {hasActivePremium ? (
                   <span>VIP Premium</span>
                 ) : (
                   <>
@@ -102,13 +103,14 @@ function AppShell({ children }) {
                   <strong>{user?.fullName || (accessToken ? 'Tài khoản của tôi' : 'Khách')}</strong>
                   {accessToken && (
                     <div className="mb-2 border-b border-slate-100 pb-2 text-xs text-slate-500">
-                      <p>Số dư: <strong>{user?.isPremium ? 'VIP Không giới hạn' : `${user?.downloadCredits ?? 2} lượt tải`}</strong></p>
+                      <p>Số dư: <strong>{hasActivePremium ? 'VIP Không giới hạn' : `${user?.downloadCredits ?? 2} lượt tải`}</strong></p>
+                      {hasActivePremium && user?.premiumExpiresAt && <p className="mt-1">Premium đến: <strong>{new Date(user.premiumExpiresAt).toLocaleDateString('vi-VN')}</strong></p>}
                     </div>
                   )}
                   {accessToken ? (
                     <>
                       <button className="text-left font-semibold text-[#00288e]" onClick={() => { setMenuOpen(false); setPremiumOpen(true) }} type="button">
-                        Nâng cấp VIP
+                        {hasActivePremium ? 'Gói Premium đang dùng' : 'Nâng cấp VIP'}
                       </button>
                       <button onClick={logout} type="button">Đăng xuất</button>
                     </>
@@ -129,6 +131,7 @@ function AppShell({ children }) {
         onClose={() => setPremiumOpen(false)}
         onSuccess={handlePremiumSuccess}
         userCredits={user?.downloadCredits ?? 2}
+        user={user}
       />
     </div>
   )
